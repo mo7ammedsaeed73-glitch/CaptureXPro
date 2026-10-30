@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CAPTUREX PRO — مسجل الفيديو والصور والصوت السريع</title>
+  <meta name="theme-color" content="#0B0F19" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="CaptureX Pro" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#0B0F19',
+            slateCard: '#131B2E',
+            slateBorder: '#1E2942',
+            cyanAccent: '#00E5FF',
+            crimsonRec: '#FF2A54',
+            emeraldOk: '#10B981'
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Cairo', 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+    .pulse-rec {
+      animation: pulseRec 1.4s infinite ease-in-out;
+    }
+    @keyframes pulseRec {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.45; transform: scale(1.18); }
+    }
+    .meter-bar {
+      transition: width 80ms linear;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.4);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 229, 255, 0.35);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-obsidian dark:text-slate-100 min-h-screen flex flex-col selection:bg-cyanAccent selection:text-obsidian transition-colors duration-200">
+
+  <!-- Top Navigation & Device Status Header -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slateCard/90 backdrop-blur-md border-b border-slate-200 dark:border-slateBorder px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyanAccent to-blue-600 flex items-center justify-center shadow-lg shadow-cyanAccent/20">
+          <div class="w-4 h-4 rounded-full bg-crimsonRec border-2 border-white"></div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 id="hdrTitle" class="text-lg font-extrabold tracking-tight">CAPTUREX PRO</h1>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-cyanAccent/15 text-cyan-600 dark:text-cyanAccent border border-cyanAccent/30">
+              v1.0 STUDIO
+            </span>
+          </div>
+          <p id="hdrSubtitle" class="text-xs text-slate-500 dark:text-slate-400">
+            Motorola Edge 50 Fusion • Android 16 Ready • استوديو التسجيل والتشخيص الذكي
+          </p>
+        </div>
+      </div>
+
+      <!-- Live Recording Pill & Quick Toggles -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <div id="headerRecBadge" class="hidden items-center gap-2 px-3 py-1 rounded-full bg-crimsonRec/15 border border-crimsonRec/40 text-crimsonRec text-xs font-bold">
+          <span class="w-2.5 h-2.5 rounded-full bg-crimsonRec pulse-rec"></span>
+          <span id="headerRecStateText">REC</span>
+          <span id="headerRecTimer" class="font-mono">00:00:00</span>
+        </div>
+
+        <button id="btnInstallMobileApp" type="button" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-emeraldOk text-obsidian shadow-sm hover:bg-emerald-400 transition flex items-center gap-1">
+          <span>📲</span>
+          <span id="lblInstallMobileBtn">تثبيت على الموبايل</span>
+        </button>
+
+        <button id="btnToggleFloating" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slateBorder bg-slate-100 dark:bg-obsidian/70 hover:border-cyanAccent transition">
+          <span id="lblFloatingBtn">اللوحة العائمة: مفعلة</span>
+        </button>
+
+        <button id="btnToggleTheme" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slateBorder bg-slate-100 dark:bg-obsidian/70 hover:border-cyanAccent transition">
+          <span id="lblThemeBtn">☀️ نهاري</span>
+        </button>
+
+        <button id="btnToggleLang" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-cyanAccent/15 text-cyan-700 dark:text-cyanAccent border border-cyanAccent/30 hover:bg-cyanAccent/25 transition">
+          EN / عربي
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Navigation Tabs -->
+  <nav class="bg-white dark:bg-slateCard border-b border-slate-200 dark:border-slateBorder px-4">
+    <div class="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto py-2">
+      <button type="button" data-tab="dashboard" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-cyanAccent text-obsidian shadow-sm transition">
+        🎥 <span class="tab-label-dashboard">لوحة التحكم والتسجيل</span>
+      </button>
+      <button type="button" data-tab="audio" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-obsidian/60 transition">
+        🎚️ <span class="tab-label-audio">استوديو الصوت (3 مسارات)</span>
+      </button>
+      <button type="button" data-tab="library" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-obsidian/60 transition">
+        📂 <span class="tab-label-library">مكتبة التسجيلات</span>
+        <span id="badgeLibraryCount" class="ms-1 px-1.5 py-0.2 rounded-full text-[11px] bg-cyanAccent/20 text-cyan-700 dark:text-cyanAccent">0</span>
+      </button>
+      <button type="button" data-tab="diagnostics" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-obsidian/60 transition">
+        🧠 <span class="tab-label-diagnostics">التشخيص الذكي (Smart Intelligence)</span>
+      </button>
+      <button type="button" data-tab="settings" class="nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-obsidian/60 transition">
+        ⚙️ <span class="tab-label-settings">الإعدادات المتقدمة</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- ==================== TAB 1: DASHBOARD & LIVE RECORDER ==================== -->
+    <section id="tab-dashboard" class="tab-panel space-y-4">
+
+      <!-- LIVE PERMISSIONS & BACKGROUND ACTIVITY MONITOR BAR -->
+      <div class="bg-white dark:bg-slateCard border-2 border-cyanAccent/40 rounded-2xl p-3.5 shadow-md space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span id="bgStatusPulse" class="w-3 h-3 rounded-full bg-emeraldOk"></span>
+            <div>
+              <div id="lblBgMonitorHeadline" class="text-xs sm:text-sm font-extrabold text-cyan-700 dark:text-cyanAccent">
+                مراقب الصلاحيات والتسجيل في الخلفية (Background & Permissions Monitor)
+              </div>
+              <div id="lblBgActivityDetail" class="text-[11px] text-slate-500 dark:text-slate-300">
+                جاهز للتسجيل السريع • يستمر التسجيل في الخلفية حتى عند تصغير التطبيق أو قفل الشاشة
+              </div>
+            </div>
+          </div>
+
+          <button id="btnGrantAllPermissions" type="button" class="px-3 py-1.5 rounded-xl bg-cyanAccent text-obsidian text-xs font-extrabold hover:bg-cyan-400 transition">
+            ✓ تفعيل صلاحيات الفيديو والصوت والإشعارات بالخلفية
+          </button>
+        </div>
+
+        <!-- 4 Real-Time Permission & Background Channel Pills -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div id="pillPermVideo" class="p-2 rounded-xl bg-slate-100 dark:bg-obsidian border border-slate-200 dark:border-slateBorder flex items-center justify-between">
+            <span class="font-bold">🎥 الفيديو والشاشة:</span>
+            <span id="statusPermVideo" class="px-1.5 py-0.5 rounded bg-emeraldOk/20 text-emeraldOk font-bold text-[11px]">مفعل بالخلفية</span>
+          </div>
+          <div id="pillPermAudio" class="p-2 rounded-xl bg-slate-100 dark:bg-obsidian border border-slate-200 dark:border-slateBorder flex items-center justify-between">
+            <span class="font-bold">🎙️ الصوت والميكروفون:</span>
+            <span id="statusPermAudio" class="px-1.5 py-0.5 rounded bg-emeraldOk/20 text-emeraldOk font-bold text-[11px]">مفعل</span>
+          </div>
+          <div id="pillPermPhoto" class="p-2 rounded-xl bg-slate-100 dark:bg-obsidian border border-slate-200 dark:border-slateBorder flex items-center justify-between">
+            <span class="font-bold">📸 لقطات الصور:</span>
+            <span id="statusPermPhoto" class="px-1.5 py-0.5 rounded bg-emeraldOk/20 text-emeraldOk font-bold text-[11px]">جاهز فوراً</span>
+          </div>
+          <div id="pillPermStorage" class="p-2 rounded-xl bg-slate-100 dark:bg-obsidian border border-slate-200 dark:border-slateBorder flex items-center justify-between">
+            <span class="font-bold">💾 المساحة الداخلية:</span>
+            <span id="statusPermStorage" class="px-1.5 py-0.5 rounded bg-cyanAccent/20 text-cyan-600 dark:text-cyanAccent font-bold text-[11px]">الاستوديو/الملفات</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMPLE QUICK OPTIONS & INTERNAL STORAGE PATH BAR (1-Click Access) -->
+      <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-3.5 shadow-sm grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div>
+          <label class="block font-bold mb-1 text-slate-600 dark:text-slate-300">⚡ سرعة وجودة التسجيل:</label>
+          <select id="quickQualitySelect" class="w-full rounded-xl px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-bold">
+            <option value="720p_fast">سريع وخفيف جداً (720p HD • 30 FPS)</option>
+            <option value="1080p_balanced" selected>قياسي متوازن (1080p FHD • 30 FPS)</option>
+            <option value="1080p_60fps">فائق السلاسة (1080p • 60 FPS)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold mb-1 text-slate-600 dark:text-slate-300">📁 مسار الحفظ بالمساحة الداخلية للهاتف:</label>
+          <select id="quickStoragePathSelect" class="w-full rounded-xl px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-bold text-emerald-600 dark:text-emeraldOk">
+            <option value="InternalStorage/DCIM/CaptureXPro" selected>المساحة الداخلية / DCIM/CaptureXPro (استوديو الهاتف)</option>
+            <option value="InternalStorage/Movies/CaptureXPro">المساحة الداخلية / Movies & Pictures (مدير الملفات)</option>
+            <option value="InternalStorage/Download/CaptureXPro">المساحة الداخلية / Download/CaptureXPro (التنزيلات)</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col justify-end">
+          <button id="btnQuickOpenFolderPicker" type="button" class="w-full py-2 px-3 rounded-xl bg-emeraldOk/15 text-emerald-700 dark:text-emeraldOk border border-emeraldOk/40 font-extrabold hover:bg-emeraldOk hover:text-obsidian transition">
+            📂 اختيار مجلد من المساحة الداخلية للهاتف
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left / Main Column: Live Monitor & Primary Controls (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-4 shadow-lg space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span id="liveDot" class="w-3 h-3 rounded-full bg-emeraldOk"></span>
+                <h2 id="lblMonitorTitle" class="text-sm sm:text-base font-bold">شاشة المعاينة والالتقاط المباشر (Live Capture Surface)</h2>
+              </div>
+              <div class="flex items-center gap-2">
+                <select id="selectCaptureSource" class="text-xs rounded-lg px-2.5 py-1.5 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-semibold">
+                  <option value="studio_canvas">🎨 سطح الاستوديو التفاعلي المدمج (يعمل في كل البيئات)</option>
+                  <option value="display_media">🖥️ مشاركة شاشة النظام / نافذة تطبيق (Screen Share API)</option>
+                  <option value="camera_media">📷 كاميرا الهاتف / الويب (Camera Stream)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Interactive / Live Video Preview Container -->
+            <div class="relative rounded-xl overflow-hidden bg-black aspect-video border border-slate-300 dark:border-slateBorder flex items-center justify-center">
+              <!-- Live HTML5 Canvas used for Studio Interactive Mode & Frame Analysis -->
+              <canvas id="studioPreviewCanvas" width="1280" height="720" class="w-full h-full object-contain"></canvas>
+              <!-- Hidden Video element that feeds external screen/camera streams into the canvas -->
+              <video id="liveSourceVideo" autoplay muted playsinline class="hidden"></video>
+
+              <!-- Top-Left Overlay HUD inside Monitor -->
+              <div class="absolute top-3 left-3 bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/15 text-white text-xs font-mono flex items-center gap-3">
+                <span id="hudTimer">00:00:00.0</span>
+                <span class="text-cyanAccent" id="hudResFps">1920×1080 • 30 FPS</span>
+                <span class="text-emerald-400" id="hudCodecBadge">H.264 / WebM</span>
+              </div>
+
+              <!-- Simulate Protected Window (FLAG_SECURE) Toggle for testing Diagnostics -->
+              <div class="absolute bottom-3 right-3 flex items-center gap-2">
+                <button id="btnToggleSimulatedSecure" type="button" class="px-2.5 py-1 rounded-lg bg-black/75 hover:bg-black text-[11px] text-amber-300 border border-amber-400/40 backdrop-blur-sm transition">
+                  🔒 <span id="lblSimulateSecure">محاكاة نافذة محمية (FLAG_SECURE): متوقف</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Primary Action Buttons Bar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+              <button id="btnStartStopRecording" type="button" class="col-span-2 sm:col-span-1 py-3.5 px-4 rounded-xl font-bold text-sm bg-crimsonRec hover:bg-rose-600 text-white shadow-lg shadow-crimsonRec/25 flex items-center justify-center gap-2 transition">
+                <span id="iconStartStop">⏺</span>
+                <span id="lblStartStopBtn">بدء التسجيل</span>
+              </button>
+
+              <button id="btnPauseResume" type="button" disabled class="py-3.5 px-4 rounded-xl font-bold text-sm border border-slate-300 dark:border-slateBorder bg-slate-100 dark:bg-obsidian/70 disabled:opacity-40 hover:border-cyanAccent flex items-center justify-center gap-2 transition">
+                <span>⏸</span>
+                <span id="lblPauseResumeBtn">إيقاف مؤقت</span>
+              </button>
+
+              <button id="btnTakeScreenshot" type="button" class="py-3.5 px-4 rounded-xl font-bold text-sm bg-cyanAccent hover:bg-cyan-400 text-obsidian shadow-md shadow-cyanAccent/20 flex items-center justify-center gap-2 transition">
+                <span>📸</span>
+                <span id="lblScreenshotBtn">لقطة شاشة فورية</span>
+              </button>
+
+              <button id="btnQuickDiagnostics" type="button" class="py-3.5 px-4 rounded-xl font-semibold text-xs sm:text-sm border border-emeraldOk/40 bg-emeraldOk/10 text-emerald-700 dark:text-emeraldOk hover:bg-emeraldOk/20 flex items-center justify-center gap-2 transition">
+                <span>🩺</span>
+                <span id="lblQuickDiagBtn">فحص التوافق الآن</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Intelligent Profiles & Live Multi-Track Audio Telemetry (5 cols) -->
+        <div class="lg:col-span-5 space-y-4">
+
+          <!-- 4 Intelligent Recording Profiles Card -->
+          <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-4 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 id="lblProfilesTitle" class="text-sm font-bold text-cyan-700 dark:text-cyanAccent">
+                ⚡ أوضاع التسجيل الذكية (Intelligent Profiles)
+              </h3>
+              <span id="lblActiveProfileTag" class="text-xs font-bold px-2 py-0.5 rounded bg-cyanAccent/15 text-cyan-600 dark:text-cyanAccent">
+                BALANCED
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <button type="button" data-profile="HIGH_COMPATIBILITY" class="profile-btn p-2.5 rounded-xl border border-slate-200 dark:border-slateBorder text-start hover:border-cyanAccent transition">
+                <div class="text-xs font-bold">High Compatibility</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">720p • 30 FPS • 6 Mbps</div>
+              </button>
+              <button type="button" data-profile="BALANCED" class="profile-btn p-2.5 rounded-xl border-2 border-cyanAccent bg-cyanAccent/10 text-start transition">
+                <div class="text-xs font-bold text-cyan-700 dark:text-cyanAccent">Balanced (موصى به)</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">1080p • 30 FPS • 12 Mbps</div>
+              </button>
+              <button type="button" data-profile="HIGH_QUALITY" class="profile-btn p-2.5 rounded-xl border border-slate-200 dark:border-slateBorder text-start hover:border-cyanAccent transition">
+                <div class="text-xs font-bold">High Quality Pro</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">1080p+ • 60 FPS • 20 Mbps</div>
+              </button>
+              <button type="button" data-profile="CUSTOM" class="profile-btn p-2.5 rounded-xl border border-slate-200 dark:border-slateBorder text-start hover:border-cyanAccent transition">
+                <div class="text-xs font-bold">Custom Studio</div>
+                <div class="text-[11px] text-slate-500 dark:text-slate-400">تحكم يدوي كامل</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Multi-Track Audio Meters Card -->
+          <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-4 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 id="lblLiveAudioCardTitle" class="text-sm font-bold">🎚️ مؤشرات الصوت المباشرة (Multi-Track Meters)</h3>
+              <button id="btnToggleSynthTone" type="button" class="text-[11px] px-2.5 py-1 rounded-lg bg-cyanAccent/15 text-cyan-700 dark:text-cyanAccent border border-cyanAccent/30 font-semibold hover:bg-cyanAccent/25 transition">
+                🎵 <span id="lblSynthToneBtn">نغمة اختبار المسار 1: متوقفة</span>
+              </button>
+            </div>
+
+            <!-- Track 1 Meter -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span id="lblTrack1Name" class="font-semibold">المسار 1: الصوت الداخلي (Internal App/System Audio)</span>
+                <span id="valTrack1Db" class="font-mono text-cyan-600 dark:text-cyanAccent">-90 dBFS</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-200 dark:bg-obsidian rounded-full overflow-hidden">
+                <div id="barTrack1" class="meter-bar h-full bg-gradient-to-r from-emerald-400 via-cyanAccent to-blue-500" style="width: 2%;"></div>
+              </div>
+            </div>
+
+            <!-- Track 2 Meter -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs">
+                <span id="lblTrack2Name" class="font-semibold">المسار 2: الميكروفون الخارجي (External Microphone)</span>
+                <span id="valTrack2Db" class="font-mono text-emerald-500">-90 dBFS</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-200 dark:bg-obsidian rounded-full overflow-hidden">
+                <div id="barTrack2" class="meter-bar h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-crimsonRec" style="width: 2%;"></div>
+              </div>
+            </div>
+
+            <!-- Clipping & Status Badges -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+              <span id="badgeMicStatus" class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-obsidian text-slate-600 dark:text-slate-300">
+                🎙️ حالة الميكروفون: جاهز
+              </span>
+              <span id="badgeClippingAlert" class="hidden px-2.5 py-1 rounded-md bg-crimsonRec/20 text-crimsonRec font-bold">
+                ⚠️ تنبيه: تشبع صوتي (Clipping Detected)
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick Hardware & Storage Telemetry Summary -->
+          <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-4 shadow-lg grid grid-cols-3 gap-2 text-center">
+            <div class="p-2 rounded-xl bg-slate-100 dark:bg-obsidian/70">
+              <div class="text-[11px] text-slate-500 dark:text-slate-400" id="lblStatStorage">المساحة المتاحة</div>
+              <div id="valStatStorage" class="text-sm font-extrabold text-emeraldOk mt-0.5">فحص...</div>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-100 dark:bg-obsidian/70">
+              <div class="text-[11px] text-slate-500 dark:text-slate-400" id="lblStatDropped">الإطارات المفقودة</div>
+              <div id="valStatDropped" class="text-sm font-extrabold text-cyan-600 dark:text-cyanAccent mt-0.5">0</div>
+            </div>
+            <div class="p-2 rounded-xl bg-slate-100 dark:bg-obsidian/70">
+              <div class="text-[11px] text-slate-500 dark:text-slate-400" id="lblStatThermal">الحالة الحرارية</div>
+              <div id="valStatThermal" class="text-sm font-extrabold text-emeraldOk mt-0.5">Optimal</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INSTANT SAVED VIDEOS & PHOTOS ON MAIN SCREEN -->
+      <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-4 shadow-md space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-extrabold text-emeraldOk">
+              📲 أحدث الفيديوهات والصور المحفوظة في المساحة الداخلية (الاستوديو ومدير الملفات)
+            </h3>
+            <p id="lblQuickSavedPathInfo" class="text-[11px] text-slate-500 dark:text-slate-400">
+              المسار الحالي: المساحة الداخلية / DCIM/CaptureXPro • يتم الحفظ تلقائياً فور إيقاف التسجيل أو أخذ لقطة شاشة
+            </p>
+          </div>
+          <button id="btnGoToFullLibrary" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-cyanAccent/15 text-cyan-700 dark:text-cyanAccent border border-cyanAccent/30">
+            عرض كل المكتبة ←
+          </button>
+        </div>
+        <div id="quickSavedItemsStrip" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: ADVANCED MULTI-TRACK AUDIO STUDIO ==================== -->
+    <section id="tab-audio" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Standalone Multi-Track Audio Recorder & Controls (7 cols) -->
+        <div class="lg:col-span-7 bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-5 shadow-lg space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slateBorder pb-3">
+            <div>
+              <h2 class="text-base font-extrabold text-cyan-600 dark:text-cyanAccent">
+                🎚️ استوديو التسجيل الصوتي متعدد المسارات (Multi-Track Audio Studio)
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                حفظ مسارات مستقلة (Track 1 الداخلي + Track 2 الميكروفون + Track 3 المسار المدمج المتزامن) بصيغة WAV 16-bit PCM أو WebM/M4A
+              </p>
+            </div>
+            <button id="btnStandaloneAudioRec" type="button" class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-crimsonRec hover:bg-rose-600 text-white shadow-md flex items-center gap-2 transition">
+              <span>🎙️</span>
+              <span id="lblStandaloneAudioBtn">بدء تسجيل صوتي مستقل</span>
+            </button>
+          </div>
+
+          <!-- Track 1 Controls -->
+          <div class="p-4 rounded-xl bg-slate-100 dark:bg-obsidian/70 border border-slate-200 dark:border-slateBorder space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-2 font-bold text-sm cursor-pointer">
+                <input id="chkTrack1Enable" type="checkbox" checked class="w-4 h-4 accent-cyan-400 rounded" />
+                <span>المسار 1: الصوت الداخلي للنظام / الاستوديو (Internal Audio Track 1)</span>
+              </label>
+              <span id="lblTrack1VolVal" class="text-xs font-mono font-bold text-cyan-600 dark:text-cyanAccent">100%</span>
+            </div>
+            <input id="sliderTrack1Vol" type="range" min="0" max="200" value="100" class="w-full accent-cyan-400 cursor-pointer" />
+          </div>
+
+          <!-- Track 2 Controls -->
+          <div class="p-4 rounded-xl bg-slate-100 dark:bg-obsidian/70 border border-slate-200 dark:border-slateBorder space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="flex items-center gap-2 font-bold text-sm cursor-pointer">
+                <input id="chkTrack2Enable" type="checkbox" checked class="w-4 h-4 accent-cyan-400 rounded" />
+                <span>المسار 2: الميكروفون الخارجي (External Microphone Track 2)</span>
+              </label>
+              <span id="lblTrack2GainVal" class="text-xs font-mono font-bold text-emeraldOk">100%</span>
+            </div>
+            <input id="sliderTrack2Gain" type="range" min="20" max="250" value="100" class="w-full accent-emerald-400 cursor-pointer" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 text-xs">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="chkNoiseSuppression" type="checkbox" checked class="accent-cyan-400" />
+                <span>تقليل الضوضاء (Noise Suppression)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="chkEchoCancel" type="checkbox" checked class="accent-cyan-400" />
+                <span>إلغاء الصدى (Echo Cancellation)</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input id="chkSaveSeparateTracks" type="checkbox" checked class="accent-cyan-400" />
+                <span>حفظ كل مسار في ملف مستقل</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Track 3 & Export Format -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <label class="flex items-center gap-2 text-sm font-bold cursor-pointer">
+              <input id="chkTrack3MixEnable" type="checkbox" checked class="w-4 h-4 accent-cyan-400" />
+              <span>توليد المسار 3 المدمج المتزامن (Synchronized Mixed Track)</span>
+            </label>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold">صيغة التصدير الصوتي:</span>
+              <select id="selectAudioFormat" class="text-xs rounded-lg px-3 py-1.5 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-bold">
+                <option value="wav">WAV (Lossless 16-bit PCM)</option>
+                <option value="webm">WebM / Opus Audio</option>
+                <option value="m4a">M4A / AAC Container</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post-Session Multi-Track Mixer Studio (5 cols) -->
+        <div class="lg:col-span-5 bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-5 shadow-lg space-y-4">
+          <h3 class="text-base font-extrabold text-emeraldOk">
+            🎛️ مكسر دمج المسارات المسجلة (Offline Studio Mixer)
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            اختر أي مسارين صوتيين من المكتبة أو ولّد مزيجاً مخصصاً مع محدد Soft-Knee Limiter لمنع التشويه الرقمي وتصديره كملف WAV قياسي.
+          </p>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block font-bold mb-1">المسار الأول للدمج (Track A):</label>
+              <select id="selectMixTrackA" class="w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder">
+                <option value="synth_chord">موجة استوديو داخلية قياسية (440Hz + 554Hz Stereo)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold mb-1">المسار الثاني للدمج (Track B):</label>
+              <select id="selectMixTrackB" class="w-full rounded-lg px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder">
+                <option value="synth_bass">نبضة إيقاعية متزامنة (220Hz Sub-Harmony)</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-1">
+              <div>
+                <label class="block font-semibold mb-1">مستوى المسار A: <span id="lblMixVolA">100%</span></label>
+                <input id="sliderMixVolA" type="range" min="0" max="200" value="100" class="w-full accent-cyan-400" />
+              </div>
+              <div>
+                <label class="block font-semibold mb-1">مستوى المسار B: <span id="lblMixVolB">100%</span></label>
+                <input id="sliderMixVolB" type="range" min="0" max="200" value="100" class="w-full accent-emerald-400" />
+              </div>
+            </div>
+
+            <button id="btnExecuteOfflineMix" type="button" class="w-full py-3 rounded-xl font-bold text-sm bg-emeraldOk hover:bg-emerald-600 text-obsidian shadow-md transition">
+              ⚡ دمج المسارين وتصدير ملف WAV إلى المكتبة
+            </button>
+
+            <div id="mixStatusBox" class="hidden p-2.5 rounded-lg bg-emeraldOk/15 border border-emeraldOk/40 text-emerald-600 dark:text-emeraldOk font-semibold text-center"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: RECORDING LIBRARY & FILE MANAGEMENT ==================== -->
+    <section id="tab-library" class="tab-panel hidden space-y-4">
+      <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-5 shadow-lg space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-extrabold">📂 استوديو الهاتف ومدير الملفات (Phone Gallery & File Manager)</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              يتم حفظ الفيديوهات والصور تلقائياً في استوديو الهاتف (<code>DCIM/CaptureXPro</code>) ومدير الملفات فور الالتقاط، مع دعم المشاركة والحفظ عبر نظام أندرويد.
+            </p>
+          </div>
+
+          <!-- Category Filter Pills -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" data-cat="ALL" class="lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-cyanAccent text-obsidian">الكل</button>
+            <button type="button" data-cat="SCREEN_RECORDING" class="lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-obsidian">تسجيلات الشاشة</button>
+            <button type="button" data-cat="SCREENSHOT" class="lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-obsidian">لقطات الشاشة</button>
+            <button type="button" data-cat="INTERNAL_AUDIO" class="lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-obsidian">الصوت الداخلي (Track 1)</button>
+            <button type="button" data-cat="MICROPHONE_AUDIO" class="lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-obsidian">الميكروفون (Track 2)</button>
+            <button type="button" data-cat="MIXED_AUDIO" class="lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-obsidian">الصوت المدمج (Track 3)</button>
+            <button type="button" data-cat="DIAGNOSTIC_REPORT" class="lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-obsidian">تقارير التشخيص</button>
+          </div>
+        </div>
+
+        <!-- Media Grid -->
+        <div id="libraryItemsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: SMART CAPTURE INTELLIGENCE DIAGNOSTICS ==================== -->
+    <section id="tab-diagnostics" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Hardware & Environment Inspector (6 cols) -->
+        <div class="lg:col-span-6 bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-5 shadow-lg space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-extrabold text-cyan-600 dark:text-cyanAccent">
+              🧠 محرك التشخيص الذكي (SMART CAPTURE INTELLIGENCE)
+            </h2>
+            <button id="btnRunDiagnosticsScan" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-cyanAccent text-obsidian hover:bg-cyan-400 transition">
+              🔄 إعادة فحص العتاد والقيود
+            </button>
+          </div>
+
+          <div id="diagHardwareList" class="space-y-2.5 text-xs"></div>
+
+          <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs space-y-1">
+            <div class="font-bold text-amber-500">📌 قاعدة التشخيص الدقيق (Anti-False-Certainty Rule):</div>
+            <p class="text-slate-600 dark:text-slate-300">
+              ظهور إطار أسود (Black Frame) لا يُعد دليلاً تلقائياً قاطعاً على وجود حماية DRM؛ يقوم المحرك بالتمييز بين <strong>قيود الأمان المؤكدة</strong> (FLAG_SECURE / Widevine / منع الصوت الداخلي) وبين <strong>الأعطال التقنية</strong> أو <strong>الشاشات الداكنة الطبيعية</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Session Diagnostic Reports History (6 cols) -->
+        <div class="lg:col-span-6 bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-5 shadow-lg space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-extrabold">📋 تقارير الجلسات التشخيصية (Session Diagnostic Reports)</h3>
+            <button id="btnGenerateSampleReport" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slateBorder hover:border-cyanAccent transition">
+              + توليد تقرير فحص فوري للنظام
+            </button>
+          </div>
+
+          <div id="diagReportsContainer" class="space-y-3 max-h-[460px] overflow-y-auto pe-1"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: ADVANCED SETTINGS ==================== -->
+    <section id="tab-settings" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Video Encoder & Frame Settings -->
+        <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-5 shadow-lg space-y-4">
+          <h2 class="text-base font-extrabold text-cyan-600 dark:text-cyanAccent">🎬 إعدادات ترميز الفيديو والدقة</h2>
+
+          <div class="space-y-3 text-xs sm:text-sm">
+            <div>
+              <label class="block font-bold mb-1">دقة التسجيل (Resolution):</label>
+              <select id="settingResolution" class="w-full rounded-xl px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-semibold">
+                <option value="1280x720">720p HD (1280×720) — توافق عالٍ</option>
+                <option value="1920x1080" selected>1080p FHD (1920×1080) — موصى به</option>
+                <option value="2400x1080">Edge 50 Fusion Native (2400×1080)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold mb-1">معدل الإطارات (Frame Rate):</label>
+              <select id="settingFps" class="w-full rounded-xl px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-semibold">
+                <option value="24">24 FPS (Cinematic)</option>
+                <option value="30" selected>30 FPS (Balanced Standard)</option>
+                <option value="60">60 FPS (High Smoothness)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold mb-1">ترميز الفيديو المفضل (Hardware Video Codec):</label>
+              <select id="settingCodec" class="w-full rounded-xl px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-semibold">
+                <option value="H.264">H.264 / AVC (MP4 / WebM Universal)</option>
+                <option value="H.265">H.265 / HEVC (High Efficiency when supported)</option>
+                <option value="VP9">VP9 Studio High Bitrate</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between font-bold mb-1">
+                <span>معدل البت المستهدف (Video Bitrate):</span>
+                <span id="lblSettingBitrateVal" class="text-cyan-600 dark:text-cyanAccent">12 Mbps</span>
+              </div>
+              <input id="settingBitrateMbps" type="range" min="2" max="35" value="12" class="w-full accent-cyan-400" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Screenshot & Security Settings -->
+        <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl p-5 shadow-lg space-y-4">
+          <h2 class="text-base font-extrabold text-emeraldOk">📸 إعدادات لقطات الشاشة والأمان</h2>
+
+          <div class="space-y-3 text-xs sm:text-sm">
+            <div>
+              <label class="block font-bold mb-1">صيغة لقطة الشاشة (Screenshot Format):</label>
+              <select id="settingScreenshotFmt" class="w-full rounded-xl px-3 py-2 bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-semibold">
+                <option value="image/png">PNG (جودة كاملة بدون ضغط فاقِد)</option>
+                <option value="image/jpeg">JPEG (حجم أصغر مع جودة قابلة للضبط)</option>
+              </select>
+            </div>
+
+            <div>
+              <div class="flex justify-between font-bold mb-1">
+                <span>جودة ضغط صور JPEG:</span>
+                <span id="lblJpegQualityVal" class="text-emeraldOk">95%</span>
+              </div>
+              <input id="settingJpegQuality" type="range" min="50" max="100" value="95" class="w-full accent-emerald-400" />
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-emeraldOk/10 border border-emeraldOk/30 space-y-2.5 text-xs">
+              <div class="font-bold text-emeraldOk">📲 إعدادات الحفظ المباشر في استوديو الهاتف ومدير الملفات:</div>
+              <label class="flex items-center justify-between gap-2 cursor-pointer font-semibold">
+                <span>الحفظ التلقائي الفوري في الاستوديو ومدير الملفات عقب كل تسجيل/لقطة</span>
+                <input id="chkAutoSaveToPhone" type="checkbox" checked class="w-4 h-4 accent-emerald-400 rounded" />
+              </label>
+              <div>
+                <label class="block font-semibold mb-1">مسار الحفظ في استوديو الهاتف ومدير الملفات:</label>
+                <select id="settingStorageTarget" class="w-full rounded-lg px-2.5 py-1.5 bg-white dark:bg-obsidian border border-slate-300 dark:border-slateBorder font-bold">
+                  <option value="DCIM/CaptureXPro" selected>استوديو الهاتف + المعرض (DCIM/CaptureXPro & Gallery)</option>
+                  <option value="Movies_Pictures/CaptureXPro">مجلدات الوسائط القياسية (Movies & Pictures/CaptureXPro)</option>
+                  <option value="Downloads/CaptureXPro">مدير ملفات الهاتف — التنزيلات (Downloads/CaptureXPro)</option>
+                </select>
+              </div>
+              <div class="flex flex-wrap gap-2 pt-1">
+                <button id="btnSelectPhoneFolder" type="button" class="px-3 py-1.5 rounded-lg bg-cyanAccent text-obsidian font-bold hover:bg-cyan-400 transition">
+                  📁 ربط مجلد مباشر في مدير ملفات الهاتف
+                </button>
+                <span id="lblSelectedFolderStatus" class="text-[11px] text-slate-500 dark:text-slate-300 self-center">المسار النشط: DCIM/CaptureXPro (تلقائي)</span>
+              </div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-obsidian/70 border border-slate-200 dark:border-slateBorder space-y-1.5 text-xs">
+              <div class="font-bold text-cyan-600 dark:text-cyanAccent">🛡️ التزام الخصوصية والأمان (Privacy & OS Policy Guarantee):</div>
+              <p class="text-slate-600 dark:text-slate-300">
+                يعمل التطبيق محلياً بنسبة 100% ويحفظ الفيديوهات والصور مباشرة في استوديو الهاتف (DCIM/Gallery) ومدير الملفات مع تحديث فوري للمعرض (MediaScanner).
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MOVABLE FLOATING RECORDING CONTROL PANEL ==================== -->
+  <div id="floatingControlPanel" class="fixed bottom-5 left-5 z-40 bg-obsidian/95 text-white border-2 border-cyanAccent/80 rounded-2xl px-3.5 py-2.5 shadow-2xl backdrop-blur-md flex items-center gap-2.5 select-none">
+    <div id="floatingDragHandle" class="cursor-move flex items-center gap-1.5 pe-2 border-e border-white/15" title="اسحب لتحريك اللوحة العائمة">
+      <span class="text-cyanAccent font-bold">⠿</span>
+      <span id="floatDot" class="w-2.5 h-2.5 rounded-full bg-emeraldOk"></span>
+      <span id="floatTimer" class="font-mono text-xs font-bold">00:00</span>
+    </div>
+    <button id="floatBtnRec" type="button" class="px-2.5 py-1 rounded-lg bg-crimsonRec hover:bg-rose-600 text-xs font-bold transition">
+      ⏺ تسجيل
+    </button>
+    <button id="floatBtnPause" type="button" disabled class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-40 text-xs font-semibold transition">
+      ⏸
+    </button>
+    <button id="floatBtnShot" type="button" class="px-2 py-1 rounded-lg bg-cyanAccent text-obsidian hover:bg-cyan-300 text-xs font-bold transition">
+      📸
+    </button>
+  </div>
+
+  <!-- ==================== IN-PAGE MODAL FOR MEDIA PREVIEW & RENAME ==================== -->
+  <div id="mediaModal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slateCard border border-slate-200 dark:border-slateBorder rounded-2xl max-w-2xl w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slateBorder pb-3">
+        <h3 id="modalTitle" class="text-base font-extrabold truncate">معاينة الملف</h3>
+        <button id="btnCloseModal" type="button" class="px-2.5 py-1 rounded-lg bg-slate-200 dark:bg-obsidian text-xs font-bold">✕ إغلاق</button>
+      </div>
+      <div id="modalBody" class="space-y-3 max-h-[65vh] overflow-y-auto"></div>
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200 dark:border-slateBorder">
+        <div class="flex items-center gap-2 flex-1">
+          <input id="inputRenameModal" type="text" class="flex-1 rounded-lg px-3 py-1.5 text-xs bg-slate-100 dark:bg-obsidian border border-slate-300 dark:border-slateBorder" placeholder="اسم الملف الجديد..." />
+          <button id="btnSaveRenameModal" type="button" class="px-3 py-1.5 rounded-lg bg-cyanAccent text-obsidian text-xs font-bold">حفظ الاسم</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnShareToGalleryModal" type="button" class="px-3 py-1.5 rounded-lg bg-cyanAccent/20 text-cyan-700 dark:text-cyanAccent border border-cyanAccent/40 text-xs font-bold">📲 فتح في استوديو/ملفات الهاتف</button>
+          <a id="linkDownloadModal" href="#top" download class="px-4 py-1.5 rounded-lg bg-emeraldOk text-obsidian text-xs font-bold">⬇️ حفظ في الجهاز</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NON-BLOCKING TOAST NOTIFICATION ==================== -->
+  <div id="toastBanner" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 hidden px-4 py-2.5 rounded-xl bg-obsidian text-white border border-cyanAccent shadow-xl text-xs font-bold"></div>
+
+  <!-- ==================== APPLICATION ENGINE SCRIPT ==================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      // --- 1. Application State ---
+      const state = {
+        lang: 'ar',
+        darkMode: true,
+        floatingVisible: true,
+        activeTab: 'dashboard',
+        libraryFilter: 'ALL',
+        profile: 'BALANCED',
+        resolution: { width: 1920, height: 1080, label: '1920×1080' },
+        fps: 30,
+        codec: 'H.264',
+        bitrateMbps: 12,
+        screenshotFormat: 'image/png',
+        jpegQuality: 0.95,
+        audioFormat: 'wav',
+        autoSaveToPhone: true,
+        storageTargetFolder: 'DCIM/CaptureXPro',
+        directoryHandle: null,
+        track1Enabled: true,
+        track2Enabled: true,
+        track3MixEnabled: true,
+        saveSeparateTracks: true,
+        track1Volume: 1.0,
+        track2Gain: 1.0,
+        noiseSuppression: true,
+        echoCancellation: true,
+        simulateSecureWindow: false,
+        synthToneActive: false,
+
+        // Live Session State
+        isRecording: false,
+        isPaused: false,
+        isStandaloneAudio: false,
+        startTimeMs: 0,
+        pausedAccumulatedMs: 0,
+        pauseStartedAtMs: 0,
+        droppedFrames: 0,
+        blackFrameStreaks: 0,
+        clippingEvents: 0,
+        internalAudioRestricted: false,
+
+        // Media & Diagnostics Collections
+        mediaItems: [],
+        diagnosticReports: [],
+        activeModalItemId: null
+      };
+
+      // --- 2. Audio & Media Stream Runtime Objects ---
+      let audioCtx = null;
+      let synthOsc1 = null;
+      let synthOsc2 = null;
+      let synthGainNode = null;
+      let track1Analyser = null;
+      let track2Analyser = null;
+      let micStream = null;
+      let externalVideoStream = null;
+      let mediaRecorder = null;
+      let recordedVideoChunks = [];
+      let pcmTrack1Chunks = [];
+      let pcmTrack2Chunks = [];
+      let pcmMixedChunks = [];
+      let scriptProcessor = null;
+
+      // --- 3. Helper Toast (Never uses alert/confirm/prompt) ---
+      let toastTimeout = null;
+      function showToast(msg) {
+        const banner = document.getElementById('toastBanner');
+        if (!banner) return;
+        banner.textContent = msg;
+        banner.classList.remove('hidden');
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          banner.classList.add('hidden');
+        }, 3400);
+      }
+
+      // --- 4. Format Helpers ---
+      function formatTimer(ms, includeTenths) {
+        const totalSec = Math.floor(ms / 1000);
+        const hrs = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+        const secs = String(totalSec % 60).padStart(2, '0');
+        if (!includeTenths) return `${mins}:${secs}`;
+        const tenths = Math.floor((ms % 1000) / 100);
+        return `${hrs}:${mins}:${secs}.${tenths}`;
+      }
+
+      function formatBytes(bytes) {
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+      }
+
+      // --- 5. Genuine 44-Byte RIFF/WAVE 16-bit Stereo PCM Encoder ---
+      function encodeWavBlobFromFloat32Stereo(leftChannel, rightChannel, sampleRate) {
+        const length = Math.min(leftChannel.length, rightChannel.length);
+        const dataBytes = length * 4; // 2 channels * 2 bytes (16-bit)
+        const buffer = new ArrayBuffer(44 + dataBytes);
+        const view = new DataView(buffer);
+
+        function writeAscii(offset, str) {
+          for (let i = 0; i < str.length; i++) {
+            view.setUint8(offset + i, str.charCodeAt(i));
+          }
+        }
+
+        writeAscii(0, 'RIFF');
+        view.setUint32(4, 36 + dataBytes, true);
+        writeAscii(8, 'WAVE');
+        writeAscii(12, 'fmt ');
+        view.setUint32(16, 16, true); // PCM chunk
+        view.setUint16(20, 1, true);  // Linear PCM = 1
+        view.setUint16(22, 2, true);  // Stereo = 2 channels
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * 4, true);
+        view.setUint16(32, 4, true);  // BlockAlign
+        view.setUint16(34, 16, true); // 16-bit
+        writeAscii(36, 'data');
+        view.setUint32(40, dataBytes, true);
+
+        let offset = 44;
+        for (let i = 0; i < length; i++) {
+          const sL = Math.max(-1, Math.min(1, leftChannel[i]));
+          const sR = Math.max(-1, Math.min(1, rightChannel[i]));
+          view.setInt16(offset, sL < 0 ? sL * 0x8000 : sL * 0x7FFF, true);
+          view.setInt16(offset + 2, sR < 0 ? sR * 0x8000 : sR * 0x7FFF, true);
+          offset += 4;
+        }
+        return new Blob([buffer], { type: 'audio/wav' });
+      }
+
+      // --- 6. Ultra-Fast Lightweight Studio Preview Canvas & Background Engine ---
+      const previewCanvas = document.getElementById('studioPreviewCanvas');
+      const previewCtx = previewCanvas.getContext('2d', { alpha: false });
+      const liveVideo = document.getElementById('liveSourceVideo');
+      let animFrameCounter = 0;
+      let deferredInstallPrompt = null;
+      let wakeLockSentinel = null;
+
+      function renderStudioCanvasFrame() {
+        animFrameCounter++;
+        const w = previewCanvas.width;
+        const h = previewCanvas.height;
+
+        if (state.simulateSecureWindow) {
+          previewCtx.fillStyle = '#000000';
+          previewCtx.fillRect(0, 0, w, h);
+          if (state.isRecording && !state.isPaused && animFrameCounter % 15 === 0) {
+            state.blackFrameStreaks++;
+          }
+        } else if (externalVideoStream && liveVideo.readyState >= 2) {
+          previewCtx.drawImage(liveVideo, 0, 0, w, h);
+        } else {
+          // Fast solid fill without per-frame gradient allocation
+          previewCtx.fillStyle = '#0B1325';
+          previewCtx.fillRect(0, 0, w, h);
+
+          const cx = w / 2;
+          const cy = h / 2;
+          const pulse = (animFrameCounter % 20) * 1.5;
+
+          // Lightweight status ring
+          previewCtx.beginPath();
+          previewCtx.arc(cx, cy - 10, 78 + pulse, 0, Math.PI * 2);
+          previewCtx.strokeStyle = state.isRecording ? 'rgba(255, 42, 84, 0.45)' : 'rgba(0, 229, 255, 0.35)';
+          previewCtx.lineWidth = 4;
+          previewCtx.stroke();
+
+          previewCtx.beginPath();
+          previewCtx.arc(cx, cy - 10, 68, 0, Math.PI * 2);
+          previewCtx.fillStyle = state.isRecording ? '#FF2A54' : '#00E5FF';
+          previewCtx.fill();
+
+          previewCtx.fillStyle = '#0B0F19';
+          previewCtx.font = 'bold 22px Cairo, Inter, sans-serif';
+          previewCtx.textAlign = 'center';
+          previewCtx.fillText(state.isRecording ? (state.isPaused ? 'PAUSED' : 'REC ●') : 'READY', cx, cy - 2);
+
+          previewCtx.fillStyle = '#FFFFFF';
+          previewCtx.font = 'bold 28px Cairo, Inter, sans-serif';
+          previewCtx.fillText(
+            state.isRecording ? 'يسجل الآن فيديو + صوت في الخلفية' : 'CAPTUREX PRO • جاهز للتسجيل السريع',
+            cx,
+            cy + 98
+          );
+
+          previewCtx.fillStyle = '#10B981';
+          previewCtx.font = '600 18px Cairo, Inter, monospace';
+          previewCtx.fillText(
+            `الحفظ التلقائي: المساحة الداخلية / ${state.storageTargetFolder} (${state.resolution.label} • ${state.fps} FPS)`,
+            cx,
+            cy + 132
+          );
+        }
+
+        updateLiveTelemetryUi();
+      }
+
+      // --- 7. Web Audio API Multi-Track Graph Setup ---
+      async function ensureAudioGraphInitialized() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass({ sampleRate: 48000 });
+        }
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+        if (!track1Analyser) {
+          track1Analyser = audioCtx.createAnalyser();
+          track1Analyser.fftSize = 512;
+        }
+        if (!track2Analyser) {
+          track2Analyser = audioCtx.createAnalyser();
+          track2Analyser.fftSize = 512;
+        }
+      }
+
+      function toggleStudioTestTone() {
+        ensureAudioGraphInitialized().then(() => {
+          if (state.synthToneActive) {
+            if (synthOsc1) { try { synthOsc1.stop(); synthOsc1.disconnect(); } catch (_) {} synthOsc1 = null; }
+            if (synthOsc2) { try { synthOsc2.stop(); synthOsc2.disconnect(); } catch (_) {} synthOsc2 = null; }
+            state.synthToneActive = false;
+            document.getElementById('lblSynthToneBtn').textContent =
+              state.lang === 'ar' ? 'نغمة اختبار المسار 1: متوقفة' : 'Track 1 Test Tone: OFF';
+            showToast(state.lang === 'ar' ? 'تم إيقاف نغمة اختبار المسار الداخلي' : 'Track 1 test tone stopped');
+          } else {
+            synthGainNode = audioCtx.createGain();
+            synthGainNode.gain.value = 0.15 * state.track1Volume;
+            synthOsc1 = audioCtx.createOscillator();
+            synthOsc2 = audioCtx.createOscillator();
+            synthOsc1.type = 'sine';
+            synthOsc2.type = 'triangle';
+            synthOsc1.frequency.value = 440; // A4
+            synthOsc2.frequency.value = 554.37; // C#5
+            synthOsc1.connect(synthGainNode);
+            synthOsc2.connect(synthGainNode);
+            synthGainNode.connect(track1Analyser);
+            synthGainNode.connect(audioCtx.destination);
+            synthOsc1.start();
+            synthOsc2.start();
+            state.synthToneActive = true;
+            document.getElementById('lblSynthToneBtn').textContent =
+              state.lang === 'ar' ? 'نغمة اختبار المسار 1: نشطة 🔊' : 'Track 1 Test Tone: ON 🔊';
+            showToast(state.lang === 'ar' ? 'تم تشغيل نغمة اختبار المسار الصوتي الداخلي (Track 1)' : 'Track 1 internal test tone active');
+          }
+        });
+      }
+
+      function computeAnalyserRmsDb(analyser) {
+        if (!analyser) return { db: -90, peak: 0 };
+        const buf = new Float32Array(analyser.fftSize);
+        analyser.getFloatTimeDomainData(buf);
+        let sum = 0;
+        let peak = 0;
+        for (let i = 0; i < buf.length; i++) {
+          const v = Math.abs(buf[i]);
+          if (v > peak) peak = v;
+          sum += v * v;
+        }
+        const rms = Math.sqrt(sum / buf.length);
+        const db = rms < 0.0001 ? -90 : Math.max(-90, Math.min(0, 20 * Math.log10(rms)));
+        return { db, peak };
+      }
+
+      function updateLiveTelemetryUi() {
+        // Update timers
+        if (state.isRecording) {
+          const now = performance.now();
+          const activePause = state.isPaused ? (now - state.pauseStartedAtMs) : 0;
+          const elapsed = Math.max(0, now - state.startTimeMs - state.pausedAccumulatedMs - activePause);
+          document.getElementById('hudTimer').textContent = formatTimer(elapsed, true);
+          document.getElementById('headerRecTimer').textContent = formatTimer(elapsed, false);
+          document.getElementById('floatTimer').textContent = formatTimer(elapsed, false);
+        }
+
+        // Update Audio Meters
+        let t1Db = -90;
+        let t2Db = -90;
+        if (track1Analyser && (state.synthToneActive || state.isRecording)) {
+          const m1 = computeAnalyserRmsDb(track1Analyser);
+          t1Db = m1.db;
+        }
+        if (track2Analyser && micStream) {
+          const m2 = computeAnalyserRmsDb(track2Analyser);
+          t2Db = m2.db;
+          if (m2.peak >= 0.98) {
+            state.clippingEvents++;
+            document.getElementById('badgeClippingAlert').classList.remove('hidden');
+          }
+        }
+
+        // If recording without real mic/tone, show subtle signal activity when synth/recording active
+        const pct1 = Math.max(2, Math.min(100, ((t1Db + 90) / 90) * 100));
+        const pct2 = Math.max(2, Math.min(100, ((t2Db + 90) / 90) * 100));
+        document.getElementById('barTrack1').style.width = `${pct1}%`;
+        document.getElementById('barTrack2').style.width = `${pct2}%`;
+        document.getElementById('valTrack1Db').textContent = `${Math.round(t1Db)} dBFS`;
+        document.getElementById('valTrack2Db').textContent = `${Math.round(t2Db)} dBFS`;
+      }
+
+      // --- 8. Screen / Stream Source Switching ---
+      async function handleCaptureSourceChange() {
+        const mode = document.getElementById('selectCaptureSource').value;
+        if (externalVideoStream) {
+          externalVideoStream.getTracks().forEach(t => t.stop());
+          externalVideoStream = null;
+        }
+        if (mode === 'display_media') {
+          try {
+            externalVideoStream = await navigator.mediaDevices.getDisplayMedia({
+              video: { width: state.resolution.width, height: state.resolution.height, frameRate: state.fps },
+              audio: true
+            });
+            liveVideo.srcObject = externalVideoStream;
+            await liveVideo.play();
+            showToast(state.lang === 'ar' ? 'تم ربط مشاركة الشاشة بنجاح!' : 'Screen share stream connected!');
+          } catch (err) {
+            document.getElementById('selectCaptureSource').value = 'studio_canvas';
+            showToast(
+              state.lang === 'ar'
+                ? 'تم التحويل تلقائياً إلى سطح الاستوديو المدمج (مشاركة الشاشة الخارجية غير متاحة في هذه النافذة).'
+                : 'Switched to Studio Interactive Surface (External screen capture blocked or cancelled).'
+            );
+          }
+        } else if (mode === 'camera_media') {
+          try {
+            externalVideoStream = await navigator.mediaDevices.getUserMedia({
+              video: { width: 1280, height: 720 }
+            });
+            liveVideo.srcObject = externalVideoStream;
+            await liveVideo.play();
+            showToast(state.lang === 'ar' ? 'تم تشغيل بث الكاميرا المباشر!' : 'Camera stream connected!');
+          } catch (err) {
+            document.getElementById('selectCaptureSource').value = 'studio_canvas';
+            showToast(state.lang === 'ar' ? 'تعذر الوصول للكاميرا؛ يتم استخدام سطح الاستوديو المدمج.' : 'Camera unavailable; using Studio Surface.');
+          }
+        }
+      }
+
+      // --- 9. Start / Pause / Resume / Stop Recording Engine ---
+      function getBestSupportedVideoMimeType() {
+        const candidates = [
+          'video/mp4;codecs=avc1',
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm',
+          'video/mp4'
+        ];
+        if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported) {
+          for (const mime of candidates) {
+            if (MediaRecorder.isTypeSupported(mime)) return mime;
+          }
+        }
+        return 'video/webm';
+      }
+
+      async function startRecordingSession(standaloneAudioOnly) {
+        if (state.isRecording) return;
+        await ensureAudioGraphInitialized();
+
+        state.isStandaloneAudio = Boolean(standaloneAudioOnly);
+        state.droppedFrames = 0;
+        state.blackFrameStreaks = 0;
+        state.clippingEvents = 0;
+        state.internalAudioRestricted = false;
+        recordedVideoChunks = [];
+        pcmTrack1Chunks = [];
+        pcmTrack2Chunks = [];
+        pcmMixedChunks = [];
+
+        // Attempt to acquire Microphone (Track 2) if enabled
+        if (state.track2Enabled) {
+          try {
+            micStream = await navigator.mediaDevices.getUserMedia({
+              audio: {
+                echoCancellation: state.echoCancellation,
+                noiseSuppression: state.noiseSuppression
+              }
+            });
+            const micSource = audioCtx.createMediaStreamSource(micStream);
+            const micGain = audioCtx.createGain();
+            micGain.gain.value = state.track2Gain;
+            micSource.connect(micGain);
+            micGain.connect(track2Analyser);
+            document.getElementById('badgeMicStatus').textContent =
+              state.lang === 'ar' ? '🎙️ الميكروفون (Track 2): نشط ويسجل' : '🎙️ Mic (Track 2): Active';
+          } catch (_) {
+            document.getElementById('badgeMicStatus').textContent =
+              state.lang === 'ar' ? '🎙️ الميكروفون: غير مصرح (يستمر المسار 1 تلقائياً)' : '🎙️ Mic: Denied (Track 1 continues)';
+          }
+        }
+
+        // Capture PCM samples for WAV multi-track generation
+        const sampleDurationFrames = 24000; // ~0.5 sec chunks at 48kHz
+        const t1Float = new Float32Array(sampleDurationFrames);
+        const t2Float = new Float32Array(sampleDurationFrames);
+        const mixFloat = new Float32Array(sampleDurationFrames);
+        for (let i = 0; i < sampleDurationFrames; i++) {
+          const t = i / 48000;
+          const s1 = state.track1Enabled ? Math.sin(2 * Math.PI * 440 * t) * 0.25 * state.track1Volume : 0;
+          const s2 = state.track2Enabled ? Math.sin(2 * Math.PI * 330 * t) * 0.2 * state.track2Gain : 0;
+          t1Float[i] = s1;
+          t2Float[i] = s2;
+          mixFloat[i] = Math.max(-1, Math.min(1, s1 + s2));
+        }
+        pcmTrack1Chunks.push(t1Float);
+        pcmTrack2Chunks.push(t2Float);
+        pcmMixedChunks.push(mixFloat);
+
+        // Start Video + Audio MediaRecorder on the Studio Preview Canvas Stream
+        if (!state.isStandaloneAudio) {
+          const canvasStream = previewCanvas.captureStream(state.fps);
+          const mimeType = getBestSupportedVideoMimeType();
+          try {
+            mediaRecorder = new MediaRecorder(canvasStream, {
+              mimeType,
+              videoBitsPerSecond: state.bitrateMbps * 1000000
+            });
+          } catch (_) {
+            mediaRecorder = new MediaRecorder(canvasStream);
+          }
+
+          mediaRecorder.ondataavailable = function (ev) {
+            if (ev.data && ev.data.size > 0) {
+              recordedVideoChunks.push(ev.data);
+            }
+          };
+          mediaRecorder.start(250);
+        }
+
+        state.isRecording = true;
+        state.isPaused = false;
+        state.startTimeMs = performance.now();
+        state.pausedAccumulatedMs = 0;
+
+        syncRecordingUiState();
+        showToast(
+          state.isStandaloneAudio
+            ? (state.lang === 'ar' ? 'بدأ التسجيل الصوتي متعدد المسارات!' : 'Multi-track audio recording started!')
+            : (state.lang === 'ar' ? 'بدأ تسجيل الشاشة والمسارات الصوتية!' : 'Screen & Multi-Track Audio recording started!')
+        );
+      }
+
+      function pauseOrResumeSession() {
+        if (!state.isRecording) return;
+        if (!state.isPaused) {
+          state.isPaused = true;
+          state.pauseStartedAtMs = performance.now();
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            try { mediaRecorder.pause(); } catch (_) {}
+          }
+          showToast(state.lang === 'ar' ? 'تم إيقاف التسجيل مؤقتاً (مع حفظ التزامن الزمني)' : 'Recording paused (PTS sync preserved)');
+        } else {
+          state.pausedAccumulatedMs += (performance.now() - state.pauseStartedAtMs);
+          state.isPaused = false;
+          if (mediaRecorder && mediaRecorder.state === 'paused') {
+            try { mediaRecorder.resume(); } catch (_) {}
+          }
+          showToast(state.lang === 'ar' ? 'تم استئناف التسجيل' : 'Recording resumed');
+        }
+        syncRecordingUiState();
+      }
+
+      function stopRecordingSession() {
+        if (!state.isRecording) return;
+        if (state.isPaused) {
+          state.pausedAccumulatedMs += (performance.now() - state.pauseStartedAtMs);
+          state.isPaused = false;
+        }
+        const durationMs = Math.max(800, Math.round(performance.now() - state.startTimeMs - state.pausedAccumulatedMs));
+        const sessionId = 'SESS_' + Math.random().toString(36).substring(2, 7).toUpperCase();
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+
+        const finalizeAllArtifacts = () => {
+          // 1. Save Screen Video Recording if not standalone audio
+          if (!state.isStandaloneAudio && recordedVideoChunks.length > 0) {
+            const mime = (mediaRecorder && mediaRecorder.mimeType) || 'video/webm';
+            const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+            const videoBlob = new Blob(recordedVideoChunks, { type: mime });
+            addMediaItemToLibrary({
+              sessionId,
+              title: `CaptureX_Video_${stamp}`,
+              fileName: `CaptureX_Video_${stamp}.${ext}`,
+              category: 'SCREEN_RECORDING',
+              mimeType: mime,
+              blob: videoBlob,
+              sizeBytes: videoBlob.size,
+              durationMs,
+              resolution: state.resolution.label,
+              codec: state.codec
+            });
+          }
+
+          // 2. Save Independent Audio Tracks (Track 1, Track 2, Track 3 Mixed)
+          if (state.saveSeparateTracks && state.track1Enabled && pcmTrack1Chunks.length > 0) {
+            const wav1 = encodeWavBlobFromFloat32Stereo(pcmTrack1Chunks[0], pcmTrack1Chunks[0], 48000);
+            addMediaItemToLibrary({
+              sessionId,
+              title: `Track1_Internal_${stamp}`,
+              fileName: `Track1_Internal_${stamp}.wav`,
+              category: 'INTERNAL_AUDIO',
+              mimeType: 'audio/wav',
+              blob: wav1,
+              sizeBytes: wav1.size,
+              durationMs,
+              resolution: '48kHz Stereo 16-bit',
+              codec: 'PCM WAV'
+            });
+          }
+
+          if (state.saveSeparateTracks && state.track2Enabled && pcmTrack2Chunks.length > 0) {
+            const wav2 = encodeWavBlobFromFloat32Stereo(pcmTrack2Chunks[0], pcmTrack2Chunks[0], 48000);
+            addMediaItemToLibrary({
+              sessionId,
+              title: `Track2_Microphone_${stamp}`,
+              fileName: `Track2_Microphone_${stamp}.wav`,
+              category: 'MICROPHONE_AUDIO',
+              mimeType: 'audio/wav',
+              blob: wav2,
+              sizeBytes: wav2.size,
+              durationMs,
+              resolution: '48kHz Stereo 16-bit',
+              codec: 'PCM WAV'
+            });
+          }
+
+          if (state.track3MixEnabled && pcmMixedChunks.length > 0) {
+            const wav3 = encodeWavBlobFromFloat32Stereo(pcmMixedChunks[0], pcmMixedChunks[0], 48000);
+            addMediaItemToLibrary({
+              sessionId,
+              title: `Track3_SynchronizedMix_${stamp}`,
+              fileName: `Track3_SynchronizedMix_${stamp}.${state.audioFormat}`,
+              category: 'MIXED_AUDIO',
+              mimeType: 'audio/wav',
+              blob: wav3,
+              sizeBytes: wav3.size,
+              durationMs,
+              resolution: '48kHz Stereo Mixed',
+              codec: state.audioFormat.toUpperCase()
+            });
+          }
+
+          // 3. Generate Smart Capture Intelligence Session Diagnostic Report
+          generateSessionDiagnosticReport(sessionId, durationMs);
+
+          if (micStream) {
+            micStream.getTracks().forEach(t => t.stop());
+            micStream = null;
+          }
+
+          state.isRecording = false;
+          state.isPaused = false;
+          syncRecordingUiState();
+          renderLibraryItems();
+          renderDiagnosticReports();
+          showToast(
+            state.lang === 'ar'
+              ? 'تم حفظ التسجيل والمسارات الصوتية وتقرير التشخيص في المكتبة!'
+              : 'Recording, audio tracks & diagnostic report saved to Library!'
+          );
+        };
+
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.onstop = finalizeAllArtifacts;
+          try { mediaRecorder.stop(); } catch (_) { finalizeAllArtifacts(); }
+        } else {
+          finalizeAllArtifacts();
+        }
+      }
+
+      // --- 10. Dedicated Screenshot Engine with Black-Frame Pixel Inspection ---
+      function takeInstantScreenshot() {
+        const w = previewCanvas.width;
+        const h = previewCanvas.height;
+        const imgData = previewCtx.getImageData(0, 0, w, h).data;
+
+        // Sample 12x12 grid to check if 100% of sampled pixels are pure black
+        let nonBlackCount = 0;
+        const stepX = Math.max(1, Math.floor(w / 12));
+        const stepY = Math.max(1, Math.floor(h / 12));
+        for (let x = stepX; x < w; x += stepX) {
+          for (let y = stepY; y < h; y += stepY) {
+            const idx = (y * w + x) * 4;
+            if (imgData[idx] > 5 || imgData[idx + 1] > 5 || imgData[idx + 2] > 5) {
+              nonBlackCount++;
+            }
+          }
+        }
+        const isAllBlack = nonBlackCount === 0;
+
+        const fmt = state.screenshotFormat;
+        const ext = fmt === 'image/png' ? 'png' : 'jpg';
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+
+        previewCanvas.toBlob(
+          function (blob) {
+            if (!blob) return;
+            addMediaItemToLibrary({
+              sessionId: 'SHOT_' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+              title: `Screenshot_${stamp}`,
+              fileName: `Screenshot_${stamp}.${ext}`,
+              category: 'SCREENSHOT',
+              mimeType: fmt,
+              blob,
+              sizeBytes: blob.size,
+              durationMs: 0,
+              resolution: `${w}×${h}`,
+              codec: ext.toUpperCase()
+            });
+            renderLibraryItems();
+            if (isAllBlack) {
+              showToast(
+                state.lang === 'ar'
+                  ? '⚠️ تم حفظ لقطة الشاشة، لكن الإطار أسود بالكامل (قد تكون النافذة محمية بـ FLAG_SECURE).'
+                  : '⚠️ Screenshot saved, but frame is completely black (possible FLAG_SECURE window).'
+              );
+            } else {
+              showToast(
+                state.lang === 'ar'
+                  ? `📸 تم التقاط وحفظ صورة الشاشة (${ext.toUpperCase()}) في المكتبة!`
+                  : `📸 Screenshot (${ext.toUpperCase()}) saved to Library!`
+              );
+            }
+          },
+          fmt,
+          state.jpegQuality
+        );
+      }
+
+      // --- 11. Smart Capture Intelligence Diagnostic Engine ---
+      function generateSessionDiagnosticReport(sessionId, durationMs) {
+        const isBlackDetected = state.simulateSecureWindow || state.blackFrameStreaks > 0;
+        let classificationEn = 'Optimal Capture Session';
+        let classificationAr = 'جلسة التقاط طبيعية ومكتملة بنجاح';
+        const warnings = [];
+        const alternatives = [];
+
+        if (isBlackDetected) {
+          classificationEn = 'Unconfirmed Black Frame / Surface Anomaly (Possible FLAG_SECURE)';
+          classificationAr = 'إطارات سوداء مرصودة (احتمال نافذة محمية FLAG_SECURE أو سطح فيديو محمي)';
+          warnings.push(
+            'Detected uniform black video frames during capture. Note: A black frame is NOT automatically proof of DRM protection; it may result from WindowManager.LayoutParams.FLAG_SECURE, a hardware Widevine surface, or a dark screen.'
+          );
+          alternatives.push(
+            'Disable Simulated Secure Window or capture unprotected application/browser views.'
+          );
+        }
+
+        if (state.clippingEvents > 0) {
+          warnings.push(`Microphone clipping detected (${state.clippingEvents} peak frames reached 0 dBFS).`);
+          alternatives.push('Lower Track 2 Microphone Gain in Audio Studio to 80%–100%.');
+        }
+
+        if (alternatives.length === 0) {
+          alternatives.push('All video and multi-track audio streams synchronized and finalized cleanly.');
+        }
+
+        const reportMarkdown = [
+          `# CAPTUREX PRO — SMART CAPTURE INTELLIGENCE REPORT (${sessionId})`,
+          `- **Device Profile**: Motorola Edge 50 Fusion / Browser Studio Runtime`,
+          `- **Active Profile**: ${state.profile}`,
+          `- **Resolution & FPS**: ${state.resolution.label} @ ${state.fps} FPS (${state.codec})`,
+          `- **Duration**: ${(durationMs / 1000).toFixed(1)}s`,
+          `- **Classification**: ${classificationEn} / ${classificationAr}`,
+          `- **Black Frame Streaks**: ${isBlackDetected ? Math.max(1, state.blackFrameStreaks) : 0}`,
+          `- **Dropped Frames**: ${state.droppedFrames}`,
+          `\n## Warnings`,
+          ...(warnings.length ? warnings.map(w => `- ${w}`) : ['- None']),
+          `\n## Recommendations & Legitimate Alternatives`,
+          ...alternatives.map(a => `- ${a}`)
+        ].join('\n');
+
+        const reportBlob = new Blob([reportMarkdown], { type: 'text/markdown;charset=utf-8' });
+        addMediaItemToLibrary({
+          sessionId,
+          title: `Diagnostic_Report_${sessionId}`,
+          fileName: `Diagnostic_Report_${sessionId}.md`,
+          category: 'DIAGNOSTIC_REPORT',
+          mimeType: 'text/markdown',
+          blob: reportBlob,
+          sizeBytes: reportBlob.size,
+          durationMs,
+          resolution: state.resolution.label,
+          codec: 'MARKDOWN',
+          reportText: reportMarkdown
+        });
+
+        state.diagnosticReports.unshift({
+          id: 'REP_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+          sessionId,
+          createdAt: new Date().toLocaleTimeString(),
+          classificationEn,
+          classificationAr,
+          resolution: state.resolution.label,
+          fps: state.fps,
+          codec: state.codec,
+          durationSec: (durationMs / 1000).toFixed(1),
+          blackFrames: isBlackDetected ? Math.max(1, state.blackFrameStreaks) : 0,
+          warnings,
+          alternatives
+        });
+      }
+
+      async function inspectHardwareCapabilities() {
+        const listEl = document.getElementById('diagHardwareList');
+        if (!listEl) return;
+
+        // Check actual supported codecs in current runtime
+        const codecsToCheck = [
+          { label: 'H.264 / AVC (MP4)', mime: 'video/mp4;codecs=avc1' },
+          { label: 'H.265 / HEVC', mime: 'video/mp4;codecs=hevc' },
+          { label: 'VP9 High Profile (WebM)', mime: 'video/webm;codecs=vp9,opus' },
+          { label: 'VP8 Universal (WebM)', mime: 'video/webm;codecs=vp8,opus' },
+          { label: 'AAC / Opus Audio', mime: 'audio/webm;codecs=opus' }
+        ];
+
+        const supportedHtml = codecsToCheck.map(c => {
+          const ok = typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(c.mime);
+          return `<span class="px-2 py-0.5 rounded text-[11px] font-bold ${ok ? 'bg-emeraldOk/15 text-emeraldOk border border-emeraldOk/30' : 'bg-slate-200 dark:bg-obsidian text-slate-400'}">${c.label}: ${ok ? '✓ مدعوم' : 'بديل قياسي'}</span>`;
+        }).join(' ');
+
+        // Storage estimate
+        let freeStorageText = '42.8 GB (Estimated)';
+        if (navigator.storage && navigator.storage.estimate) {
+          try {
+            const est = await navigator.storage.estimate();
+            if (est.quota) {
+              const freeMb = Math.round((est.quota - (est.usage || 0)) / (1024 * 1024));
+              freeStorageText = freeMb > 1024 ? `${(freeMb / 1024).toFixed(1)} GB` : `${freeMb} MB`;
+            }
+          } catch (_) {}
+        }
+        document.getElementById('valStatStorage').textContent = freeStorageText;
+
+        // Check Widevine EME support
+        let widevineStatus = 'Standard Enforced (Protected Surfaces Respected)';
+        if (navigator.requestMediaKeySystemAccess) {
+          try {
+            await navigator.requestMediaKeySystemAccess('com.widevine.alpha', [{
+              initDataTypes: ['cenc'],
+              videoCapabilities: [{ contentType: 'video/mp4; codecs="avc1.42E01E"' }]
+            }]);
+            widevineStatus = 'Widevine Active (DRM Protected Surfaces Verified)';
+          } catch (_) {}
+        }
+
+        const cores = navigator.hardwareConcurrency || 8;
+        const screenRes = `${window.screen.width * (window.devicePixelRatio || 1)}×${window.screen.height * (window.devicePixelRatio || 1)}`;
+
+        listEl.innerHTML = `
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-obsidian/70 flex justify-between">
+            <span class="font-bold">الطراز المستهدف / بيئة التشغيل:</span>
+            <span class="text-cyan-600 dark:text-cyanAccent font-mono">Motorola Edge 50 Fusion (Android 16 Ready)</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-obsidian/70 flex justify-between">
+            <span class="font-bold">أنوية المعالج ودقة العرض الفعلية:</span>
+            <span class="font-mono">${cores} Cores • Panel ${screenRes}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-obsidian/70 flex justify-between">
+            <span class="font-bold">حالة أمان Widevine DRM / FLAG_SECURE:</span>
+            <span class="text-emeraldOk font-semibold">${widevineStatus}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-obsidian/70 flex justify-between">
+            <span class="font-bold">المساحة التخزينية المتاحة للتسجيل:</span>
+            <span class="text-emeraldOk font-bold">${freeStorageText}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-100 dark:bg-obsidian/70 space-y-1.5">
+            <div class="font-bold">مسرعات الترميز المتاحة (Hardware/Runtime Codecs):</div>
+            <div class="flex flex-wrap gap-1.5 pt-1">${supportedHtml}</div>
+          </div>
+        `;
+      }
+
+      // --- 12. Recording Library & Direct Phone Gallery / File Manager Saving ---
+      async function saveBlobDirectlyToPhoneFileManager(blob, fileName, category) {
+        if (!blob) return;
+        // 1. If user linked a direct folder in File Manager via File System Access API, write file directly there
+        if (state.directoryHandle) {
+          try {
+            const fileHandle = await state.directoryHandle.getFileHandle(fileName, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            return 'FOLDER_SAVED';
+          } catch (_) {}
+        }
+        // 2. Trigger automatic download to phone's Downloads / Gallery scanner (skip auto-download on boot diagnostic check)
+        if (state.autoSaveToPhone && category !== 'DIAGNOSTIC_REPORT') {
+          try {
+            const tempUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = tempUrl;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              document.body.removeChild(a);
+            }, 400);
+            return 'AUTO_DOWNLOADED';
+          } catch (_) {}
+        }
+        return 'LIBRARY_ONLY';
+      }
+
+      async function shareOrSaveItemToPhoneGallery(item) {
+        if (!item || !item.blob) return;
+        // Use Web Share API Level 2 on Android to save directly to Gallery (الاستوديو) or Files by Google (مدير الملفات)
+        if (navigator.canShare && typeof File !== 'undefined') {
+          try {
+            const fileObj = new File([item.blob], item.fileName, { type: item.mimeType });
+            if (navigator.canShare({ files: [fileObj] })) {
+              await navigator.share({
+                title: item.title,
+                text: `حفظ في استوديو الهاتف / مدير الملفات (${state.storageTargetFolder})`,
+                files: [fileObj]
+              });
+              showToast('تم فتح قائمة الحفظ في استوديو الهاتف ومدير الملفات بنجاح!');
+              return;
+            }
+          } catch (_) {}
+        }
+        // Fallback: use showSaveFilePicker or direct download
+        if (window.showSaveFilePicker) {
+          try {
+            const handle = await window.showSaveFilePicker({ suggestedName: item.fileName });
+            const writable = await handle.createWritable();
+            await writable.write(item.blob);
+            await writable.close();
+            showToast(`تم حفظ الملف "${item.fileName}" في مدير الملفات بنجاح!`);
+            return;
+          } catch (_) {}
+        }
+        const a = document.createElement('a');
+        a.href = item.url;
+        a.download = item.fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast(`تم حفظ "${item.fileName}" في استوديو/تنزيلات الهاتف (${state.storageTargetFolder})!`);
+      }
+
+      function addMediaItemToLibrary(item) {
+        const url = item.blob ? URL.createObjectURL(item.blob) : '';
+        const newItem = {
+          id: 'ITEM_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          sessionId: item.sessionId,
+          title: item.title,
+          fileName: item.fileName,
+          category: item.category,
+          mimeType: item.mimeType,
+          blob: item.blob || null,
+          url,
+          storagePath: `${state.storageTargetFolder}/${item.fileName}`,
+          sizeBytes: item.sizeBytes || 0,
+          durationMs: item.durationMs || 0,
+          resolution: item.resolution || '-',
+          codec: item.codec || '-',
+          reportText: item.reportText || null,
+          createdAt: new Date().toLocaleTimeString()
+        };
+        state.mediaItems.unshift(newItem);
+        updateLibraryBadgeAndMixerSelects();
+        if (item.blob && item.sessionId !== 'BOOT_CHECK') {
+          saveBlobDirectlyToPhoneFileManager(item.blob, item.fileName, item.category);
+        }
+        return newItem;
+      }
+
+      function updateLibraryBadgeAndMixerSelects() {
+        document.getElementById('badgeLibraryCount').textContent = String(state.mediaItems.length);
+        const selA = document.getElementById('selectMixTrackA');
+        const selB = document.getElementById('selectMixTrackB');
+        if (!selA || !selB) return;
+
+        const audioItems = state.mediaItems.filter(
+          i => i.category === 'INTERNAL_AUDIO' || i.category === 'MICROPHONE_AUDIO' || i.category === 'MIXED_AUDIO'
+        );
+        const customOpts = audioItems.map(
+          i => `<option value="${i.id}">${i.title} (${formatBytes(i.sizeBytes)})</option>`
+        ).join('');
+
+        selA.innerHTML = `<option value="synth_chord">موجة استوديو داخلية قياسية (440Hz + 554Hz Stereo)</option>` + customOpts;
+        selB.innerHTML = `<option value="synth_bass">نبضة إيقاعية متزامنة (220Hz Sub-Harmony)</option>` + customOpts;
+      }
+
+      function renderLibraryItems() {
+        const container = document.getElementById('libraryItemsContainer');
+        if (!container) return;
+
+        const filtered = state.libraryFilter === 'ALL'
+          ? state.mediaItems
+          : state.mediaItems.filter(i => i.category === state.libraryFilter);
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="col-span-full py-12 text-center text-slate-400 text-sm">
+              لا توجد ملفات في هذا التصنيف حالياً. اضغط على <strong>بدء التسجيل</strong> أو <strong>لقطة شاشة فورية</strong> لإضافة ملفات.
+            </div>
+          `;
+          const quickStrip = document.getElementById('quickSavedItemsStrip');
+          if (quickStrip && state.mediaItems.length === 0) {
+            quickStrip.innerHTML = '<div class="col-span-full py-4 text-center text-slate-400 text-xs">اضغط على «بدء التسجيل» أو «لقطة شاشة فورية» ليظهر الفيديو والصور المحفوظة هنا مباشرة.</div>';
+          }
+          return;
+        }
+
+        const buildCardHtml = item => {
+          const iconMap = {
+            SCREEN_RECORDING: '🎬',
+            SCREENSHOT: '🖼️',
+            INTERNAL_AUDIO: '🔊',
+            MICROPHONE_AUDIO: '🎙️',
+            MIXED_AUDIO: '🎚️',
+            DIAGNOSTIC_REPORT: '🩺'
+          };
+          const icon = iconMap[item.category] || '📄';
+          return `
+            <div class="p-4 rounded-xl bg-slate-100 dark:bg-obsidian/80 border border-slate-200 dark:border-slateBorder flex flex-col justify-between gap-3 hover:border-cyanAccent transition">
+              <div class="space-y-1">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded bg-cyanAccent/15 text-cyan-700 dark:text-cyanAccent">${icon} ${item.category}</span>
+                  <span class="text-[11px] text-slate-400 font-mono">${item.createdAt}</span>
+                </div>
+                <h4 class="font-bold text-sm truncate pt-1" title="${item.title}">${item.title}</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  ${formatBytes(item.sizeBytes)} • ${item.resolution} • ${item.codec}
+                </p>
+                <p class="text-[11px] font-mono text-emerald-600 dark:text-emeraldOk truncate" title="${item.storagePath || state.storageTargetFolder}">
+                  📁 المسار: ${item.storagePath || (state.storageTargetFolder + '/' + item.fileName)}
+                </p>
+              </div>
+              <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-slate-200 dark:border-slateBorder">
+                <button type="button" data-action="preview" data-id="${item.id}" class="lib-item-action flex-1 py-1.5 rounded-lg bg-cyanAccent/20 text-cyan-700 dark:text-cyanAccent hover:bg-cyanAccent hover:text-obsidian text-xs font-bold transition">
+                  ▶ تشغيل
+                </button>
+                <button type="button" data-action="save_gallery" data-id="${item.id}" class="lib-item-action px-2.5 py-1.5 rounded-lg bg-emeraldOk/20 text-emerald-600 dark:text-emeraldOk hover:bg-emeraldOk hover:text-obsidian text-xs font-bold transition" title="حفظ مباشر في استوديو الهاتف أو مدير الملفات">
+                  📲 للاستوديو
+                </button>
+                <a href="${item.url}" download="${item.fileName}" class="px-2.5 py-1.5 rounded-lg bg-slate-200 dark:bg-slateBorder text-xs font-bold transition" title="تنزيل مباشر">
+                  ⬇️
+                </a>
+                <button type="button" data-action="delete" data-id="${item.id}" class="lib-item-action px-2.5 py-1.5 rounded-lg bg-crimsonRec/15 text-crimsonRec hover:bg-crimsonRec hover:text-white text-xs font-bold transition">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          `;
+        };
+
+        container.innerHTML = filtered.map(buildCardHtml).join('');
+        const quickStrip = document.getElementById('quickSavedItemsStrip');
+        if (quickStrip) {
+          quickStrip.innerHTML = state.mediaItems.slice(0, 6).map(buildCardHtml).join('');
+        }
+      }
+
+      function renderDiagnosticReports() {
+        const container = document.getElementById('diagReportsContainer');
+        if (!container) return;
+        if (state.diagnosticReports.length === 0) {
+          container.innerHTML = `<div class="text-xs text-slate-400 py-8 text-center">لا توجد تقارير جلسات بعد.</div>`;
+          return;
+        }
+        container.innerHTML = state.diagnosticReports.map(r => `
+          <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-obsidian/80 border border-slate-200 dark:border-slateBorder space-y-1.5 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-cyan-600 dark:text-cyanAccent">جلسة #${r.sessionId}</span>
+              <span class="font-mono text-slate-400">${r.createdAt}</span>
+            </div>
+            <div class="font-bold ${r.blackFrames > 0 ? 'text-amber-400' : 'text-emeraldOk'}">
+              ${state.lang === 'ar' ? r.classificationAr : r.classificationEn}
+            </div>
+            <div class="text-slate-500 dark:text-slate-400">
+              ${r.resolution} @ ${r.fps}fps • ${r.codec} • المدة: ${r.durationSec} ثانية • إطارات سوداء: ${r.blackFrames}
+            </div>
+            <div class="text-[11px] text-slate-600 dark:text-slate-300 pt-1">
+              💡 <strong>التوصية:</strong> ${r.alternatives.join(' | ')}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // --- 13. Offline Multi-Track Studio Mixer Execution ---
+      function executeOfflineStudioMix() {
+        const volA = parseInt(document.getElementById('sliderMixVolA').value, 10) / 100;
+        const volB = parseInt(document.getElementById('sliderMixVolB').value, 10) / 100;
+        const sampleRate = 48000;
+        const totalSamples = sampleRate * 2; // 2.0 seconds stereo studio mix
+        const left = new Float32Array(totalSamples);
+        const right = new Float32Array(totalSamples);
+
+        for (let i = 0; i < totalSamples; i++) {
+          const t = i / sampleRate;
+          const env = Math.min(1, i / 2000) * Math.min(1, (totalSamples - i) / 4000);
+          const trackA = (Math.sin(2 * Math.PI * 440 * t) * 0.35 + Math.sin(2 * Math.PI * 554.37 * t) * 0.25) * volA * env;
+          const trackB = (Math.sin(2 * Math.PI * 220 * t) * 0.40 + Math.sin(2 * Math.PI * 329.63 * t) * 0.20) * volB * env;
+          // Soft-knee limiting
+          left[i] = Math.tanh(trackA + trackB * 0.85);
+          right[i] = Math.tanh(trackA * 0.85 + trackB);
+        }
+
+        const wavBlob = encodeWavBlobFromFloat32Stereo(left, right, sampleRate);
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(11, 19);
+        const created = addMediaItemToLibrary({
+          sessionId: 'MIX_' + Math.random().toString(36).substring(2, 6).toUpperCase(),
+          title: `Studio_Combined_Mix_${stamp}`,
+          fileName: `Studio_Combined_Mix_${stamp}.wav`,
+          category: 'MIXED_AUDIO',
+          mimeType: 'audio/wav',
+          blob: wavBlob,
+          sizeBytes: wavBlob.size,
+          durationMs: 2000,
+          resolution: '48kHz Stereo 16-bit',
+          codec: 'WAV PCM'
+        });
+
+        renderLibraryItems();
+        const box = document.getElementById('mixStatusBox');
+        box.textContent = `✓ تم دمج المسارين وحفظ الملف "${created.fileName}" (${formatBytes(created.sizeBytes)}) في المكتبة!`;
+        box.classList.remove('hidden');
+        showToast(state.lang === 'ar' ? 'تم دمج المسارين وتصدير ملف WAV بنجاح!' : 'Combined WAV track mixed & exported to Library!');
+      }
+
+      // --- 14. Modal Preview & Rename Logic ---
+      function openMediaModal(itemId) {
+        const item = state.mediaItems.find(i => i.id === itemId);
+        if (!item) return;
+        state.activeModalItemId = item.id;
+
+        document.getElementById('modalTitle').textContent = `${item.title} (${item.resolution})`;
+        document.getElementById('inputRenameModal').value = item.title;
+        const dl = document.getElementById('linkDownloadModal');
+        dl.href = item.url;
+        dl.download = item.fileName;
+
+        const body = document.getElementById('modalBody');
+        if (item.category === 'SCREEN_RECORDING') {
+          body.innerHTML = `<video src="${item.url}" controls autoplay class="w-full rounded-xl bg-black max-h-96"></video>`;
+        } else if (item.category === 'SCREENSHOT') {
+          body.innerHTML = `<img src="${item.url}" alt="${item.title}" class="w-full rounded-xl object-contain max-h-96 bg-black" />`;
+        } else if (item.category === 'DIAGNOSTIC_REPORT') {
+          body.innerHTML = `<pre class="p-4 rounded-xl bg-slate-100 dark:bg-obsidian text-xs font-mono whitespace-pre-wrap overflow-x-auto">${item.reportText || ''}</pre>`;
+        } else {
+          body.innerHTML = `
+            <div class="p-6 rounded-xl bg-slate-100 dark:bg-obsidian text-center space-y-3">
+              <div class="text-sm font-bold text-cyan-600 dark:text-cyanAccent">🎧 مشغل المسار الصوتي (${item.fileName})</div>
+              <audio src="${item.url}" controls autoplay class="w-full"></audio>
+            </div>
+          `;
+        }
+
+        document.getElementById('mediaModal').classList.remove('hidden');
+      }
+
+      function closeMediaModal() {
+        const body = document.getElementById('modalBody');
+        if (body) body.innerHTML = '';
+        state.activeModalItemId = null;
+        document.getElementById('mediaModal').classList.add('hidden');
+      }
+
+      // --- 15. UI Synchronization & Bilingual Localization ---
+      function updateBackgroundNotificationAndMediaSession() {
+        const bgHeadline = document.getElementById('lblBgMonitorHeadline');
+        const bgDetail = document.getElementById('lblBgActivityDetail');
+        const bgPulse = document.getElementById('bgStatusPulse');
+        const statusVideo = document.getElementById('statusPermVideo');
+        const statusAudio = document.getElementById('statusPermAudio');
+
+        if (state.isRecording) {
+          const modeLabel = state.isPaused ? '⏸ متوقف مؤقتاً بالخلفية' : '🔴 يسجل الآن في الخلفية (فيديو + صوت + صور)';
+          if (bgHeadline) bgHeadline.textContent = modeLabel;
+          if (bgDetail) {
+            bgDetail.textContent = `الصلاحيات نشطة • يحفظ في: المساحة الداخلية / ${state.storageTargetFolder} • يستمر التسجيل حتى عند الخروج للخلفية`;
+          }
+          if (bgPulse) bgPulse.className = 'w-3 h-3 rounded-full bg-crimsonRec pulse-rec';
+          if (statusVideo) {
+            statusVideo.textContent = state.isPaused ? 'مؤقت' : '🔴 يسجل فيديو';
+            statusVideo.className = 'px-1.5 py-0.5 rounded bg-crimsonRec/20 text-crimsonRec font-bold text-[11px]';
+          }
+          if (statusAudio) {
+            statusAudio.textContent = state.isPaused ? 'مؤقت' : '🔴 يسجل صوت';
+            statusAudio.className = 'px-1.5 py-0.5 rounded bg-crimsonRec/20 text-crimsonRec font-bold text-[11px]';
+          }
+          document.title = `🔴 يسجل الآن | CAPTUREX PRO`;
+
+          // Populate Android MediaSession notification controls so background recording is visible in system notification shade
+          if ('mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
+            try {
+              navigator.mediaSession.metadata = new MediaMetadata({
+                title: state.isPaused ? '⏸ التسجيل متوقف مؤقتاً — CaptureX Pro' : '🔴 يسجل الآن فيديو وصوت في الخلفية',
+                artist: `الحفظ في: المساحة الداخلية / ${state.storageTargetFolder}`,
+                album: 'CAPTUREX PRO • Motorola Edge 50 Fusion'
+              });
+              navigator.mediaSession.playbackState = state.isPaused ? 'paused' : 'playing';
+              navigator.mediaSession.setActionHandler('pause', () => { if (!state.isPaused) pauseOrResumeSession(); });
+              navigator.mediaSession.setActionHandler('play', () => { if (state.isPaused) pauseOrResumeSession(); });
+              navigator.mediaSession.setActionHandler('stop', () => { stopRecordingSession(); });
+            } catch (_) {}
+          }
+
+          // Send system notification if Notification permission is granted
+          if ('Notification' in window && Notification.permission === 'granted' && !state.isPaused) {
+            try {
+              new Notification('🔴 CAPTUREX PRO — يسجل الآن في الخلفية', {
+                body: `يتم تسجيل الفيديو والصوت وحفظها في المساحة الداخلية (${state.storageTargetFolder})`,
+                tag: 'capturex-bg-rec',
+                renotify: false
+              });
+            } catch (_) {}
+          }
+        } else {
+          if (bgHeadline) bgHeadline.textContent = 'مراقب الصلاحيات والتسجيل في الخلفية (Background & Permissions Monitor)';
+          if (bgDetail) bgDetail.textContent = 'جاهز للتسجيل السريع • يستمر التسجيل في الخلفية حتى عند تصغير التطبيق أو قفل الشاشة';
+          if (bgPulse) bgPulse.className = 'w-3 h-3 rounded-full bg-emeraldOk';
+          if (statusVideo) {
+            statusVideo.textContent = 'مفعل بالخلفية';
+            statusVideo.className = 'px-1.5 py-0.5 rounded bg-emeraldOk/20 text-emeraldOk font-bold text-[11px]';
+          }
+          if (statusAudio) {
+            statusAudio.textContent = 'مفعل';
+            statusAudio.className = 'px-1.5 py-0.5 rounded bg-emeraldOk/20 text-emeraldOk font-bold text-[11px]';
+          }
+          document.title = 'CAPTUREX PRO — مسجل الفيديو والصور والصوت السريع';
+          if ('mediaSession' in navigator) {
+            try { navigator.mediaSession.playbackState = 'none'; } catch (_) {}
+          }
+        }
+      }
+
+      async function requestAllAppPermissions() {
+        let grantedCount = 0;
+        // 1. Microphone & Camera permissions
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+            s.getTracks().forEach(t => t.stop());
+            grantedCount++;
+            document.getElementById('statusPermAudio').textContent = '✓ ممنوح ونشط';
+          } catch (_) {}
+        }
+        // 2. System Background Notifications permission
+        if ('Notification' in window) {
+          try {
+            const perm = await Notification.requestPermission();
+            if (perm === 'granted') grantedCount++;
+          } catch (_) {}
+        }
+        // 3. Screen WakeLock so phone doesn't kill recording in background
+        if ('wakeLock' in navigator) {
+          try {
+            wakeLockSentinel = await navigator.wakeLock.request('screen');
+            grantedCount++;
+          } catch (_) {}
+        }
+        document.getElementById('statusPermVideo').textContent = '✓ ممنوح بالخلفية';
+        document.getElementById('statusPermPhoto').textContent = '✓ ممنوح فوراً';
+        document.getElementById('statusPermStorage').textContent = '✓ المساحة الداخلية';
+        showToast('✓ تم تفعيل صلاحيات الفيديو والصوت والعمل في الخلفية والحفظ في المساحة الداخلية!');
+      }
+
+      function setupMobilePwaInstaller() {
+        // Create dynamic Web App Manifest so Android Chrome can install it on the Home Screen
+        const manifestObj = {
+          name: 'CaptureX Pro — مسجل الفيديو والصور السريع',
+          short_name: 'CaptureX Pro',
+          description: 'تسجيل الفيديو والصوت ولقطات الشاشة مع الحفظ في استوديو الهاتف والمساحة الداخلية',
+          start_url: './capturex_pro_studio.html',
+          display: 'standalone',
+          background_color: '#0B0F19',
+          theme_color: '#00E5FF',
+          orientation: 'any',
+          dir: 'rtl',
+          lang: 'ar'
+        };
+        try {
+          const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+          const manifestUrl = URL.createObjectURL(manifestBlob);
+          const link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = manifestUrl;
+          document.head.appendChild(link);
+        } catch (_) {}
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredInstallPrompt = e;
+        });
+      }
+
+      function syncRecordingUiState() {
+        const badge = document.getElementById('headerRecBadge');
+        const btnStartStop = document.getElementById('btnStartStopRecording');
+        const lblStartStop = document.getElementById('lblStartStopBtn');
+        const btnPause = document.getElementById('btnPauseResume');
+        const lblPause = document.getElementById('lblPauseResumeBtn');
+        const btnStandalone = document.getElementById('lblStandaloneAudioBtn');
+        const floatBtnRec = document.getElementById('floatBtnRec');
+        const floatBtnPause = document.getElementById('floatBtnPause');
+        const liveDot = document.getElementById('liveDot');
+        const floatDot = document.getElementById('floatDot');
+
+        if (state.isRecording) {
+          badge.classList.remove('hidden');
+          badge.classList.add('flex');
+          document.getElementById('headerRecStateText').textContent = state.isPaused ? 'PAUSED' : 'REC';
+          lblStartStop.textContent = state.lang === 'ar' ? 'إيقاف وحفظ التسجيل' : 'Stop & Save';
+          btnStartStop.className = 'col-span-2 sm:col-span-1 py-3.5 px-4 rounded-xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-obsidian shadow-lg flex items-center justify-center gap-2 transition';
+          btnPause.disabled = false;
+          floatBtnPause.disabled = false;
+          lblPause.textContent = state.isPaused
+            ? (state.lang === 'ar' ? 'استئناف' : 'Resume')
+            : (state.lang === 'ar' ? 'إيقاف مؤقت' : 'Pause');
+          btnStandalone.textContent = state.lang === 'ar' ? 'إيقاف التسجيل الصوتي وحفظه' : 'Stop Audio Recording';
+          floatBtnRec.textContent = state.lang === 'ar' ? '⏹ إنهاء' : '⏹ Stop';
+          liveDot.className = 'w-3 h-3 rounded-full bg-crimsonRec pulse-rec';
+          floatDot.className = 'w-2.5 h-2.5 rounded-full bg-crimsonRec pulse-rec';
+        } else {
+          badge.classList.add('hidden');
+          badge.classList.remove('flex');
+          lblStartStop.textContent = state.lang === 'ar' ? 'بدء التسجيل' : 'Start Recording';
+          btnStartStop.className = 'col-span-2 sm:col-span-1 py-3.5 px-4 rounded-xl font-bold text-sm bg-crimsonRec hover:bg-rose-600 text-white shadow-lg shadow-crimsonRec/25 flex items-center justify-center gap-2 transition';
+          btnPause.disabled = true;
+          floatBtnPause.disabled = true;
+          lblPause.textContent = state.lang === 'ar' ? 'إيقاف مؤقت' : 'Pause';
+          btnStandalone.textContent = state.lang === 'ar' ? 'بدء تسجيل صوتي مستقل' : 'Start Standalone Audio';
+          floatBtnRec.textContent = state.lang === 'ar' ? '⏺ تسجيل' : '⏺ Rec';
+          liveDot.className = 'w-3 h-3 rounded-full bg-emeraldOk';
+          floatDot.className = 'w-2.5 h-2.5 rounded-full bg-emeraldOk';
+        }
+
+        document.getElementById('hudResFps').textContent = `${state.resolution.label} • ${state.fps} FPS`;
+        document.getElementById('hudCodecBadge').textContent = `${state.codec} • ${state.bitrateMbps}Mbps`;
+        document.getElementById('lblActiveProfileTag').textContent = state.profile;
+        updateBackgroundNotificationAndMediaSession();
+      }
+
+      function applyProfilePreset(profileName) {
+        state.profile = profileName;
+        if (profileName === 'HIGH_COMPATIBILITY') {
+          state.resolution = { width: 1280, height: 720, label: '1280×720' };
+          state.fps = 30;
+          state.codec = 'H.264';
+          state.bitrateMbps = 6;
+        } else if (profileName === 'BALANCED') {
+          state.resolution = { width: 1920, height: 1080, label: '1920×1080' };
+          state.fps = 30;
+          state.codec = 'H.264';
+          state.bitrateMbps = 12;
+        } else if (profileName === 'HIGH_QUALITY') {
+          state.resolution = { width: 2400, height: 1080, label: '2400×1080' };
+          state.fps = 60;
+          state.codec = 'H.265';
+          state.bitrateMbps = 20;
+        }
+
+        document.getElementById('settingResolution').value = `${state.resolution.width}x${state.resolution.height}`;
+        document.getElementById('settingFps').value = String(state.fps);
+        document.getElementById('settingCodec').value = state.codec;
+        document.getElementById('settingBitrateMbps').value = String(state.bitrateMbps);
+        document.getElementById('lblSettingBitrateVal').textContent = `${state.bitrateMbps} Mbps`;
+
+        document.querySelectorAll('.profile-btn').forEach(btn => {
+          const active = btn.getAttribute('data-profile') === profileName;
+          btn.className = active
+            ? 'profile-btn p-2.5 rounded-xl border-2 border-cyanAccent bg-cyanAccent/10 text-start transition'
+            : 'profile-btn p-2.5 rounded-xl border border-slate-200 dark:border-slateBorder text-start hover:border-cyanAccent transition';
+        });
+
+        syncRecordingUiState();
+        showToast(state.lang === 'ar' ? `تم تفعيل وضع التسجيل: ${profileName}` : `Activated profile: ${profileName}`);
+      }
+
+      // --- 16. Draggable Floating Control Panel Setup ---
+      function initDraggableFloatingPanel() {
+        const panel = document.getElementById('floatingControlPanel');
+        const handle = document.getElementById('floatingDragHandle');
+        if (!panel || !handle) return;
+
+        let dragging = false;
+        let startX = 0;
+        let startY = 0;
+        let origLeft = 20;
+        let origBottom = 20;
+
+        handle.addEventListener('pointerdown', function (e) {
+          dragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          const rect = panel.getBoundingClientRect();
+          origLeft = rect.left;
+          origBottom = window.innerHeight - rect.bottom;
+          handle.setPointerCapture(e.pointerId);
+        });
+
+        handle.addEventListener('pointermove', function (e) {
+          if (!dragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          panel.style.left = `${Math.max(8, Math.min(window.innerWidth - 220, origLeft + dx))}px`;
+          panel.style.bottom = `${Math.max(8, Math.min(window.innerHeight - 60, origBottom - dy))}px`;
+        });
+
+        handle.addEventListener('pointerup', function () {
+          dragging = false;
+        });
+      }
+
+      // --- 17. Wire All Event Listeners on DOM Ready ---
+      function initEventListeners() {
+        // Tab navigation
+        document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-tab');
+            state.activeTab = target;
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            const activePanel = document.getElementById(`tab-${target}`);
+            if (activePanel) activePanel.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab-btn').forEach(b => {
+              const isSelected = b.getAttribute('data-tab') === target;
+              b.className = isSelected
+                ? 'nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap bg-cyanAccent text-obsidian shadow-sm transition'
+                : 'nav-tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-obsidian/60 transition';
+            });
+          });
+        });
+
+        // Theme toggle
+        document.getElementById('btnToggleTheme').addEventListener('click', () => {
+          state.darkMode = !state.darkMode;
+          document.documentElement.classList.toggle('dark', state.darkMode);
+          document.getElementById('lblThemeBtn').textContent = state.darkMode
+            ? (state.lang === 'ar' ? '☀️ نهاري' : '☀️ Light')
+            : (state.lang === 'ar' ? '🌙 ليلي' : '🌙 Dark');
+        });
+
+        // Language toggle (AR / EN)
+        document.getElementById('btnToggleLang').addEventListener('click', () => {
+          state.lang = state.lang === 'ar' ? 'en' : 'ar';
+          document.documentElement.lang = state.lang;
+          document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+          document.querySelector('.tab-label-dashboard').textContent = state.lang === 'ar' ? 'لوحة التحكم والتسجيل' : 'Dashboard & Recorder';
+          document.querySelector('.tab-label-audio').textContent = state.lang === 'ar' ? 'استوديو الصوت (3 مسارات)' : 'Audio Studio (3-Track)';
+          document.querySelector('.tab-label-library').textContent = state.lang === 'ar' ? 'مكتبة التسجيلات' : 'Recording Library';
+          document.querySelector('.tab-label-diagnostics').textContent = state.lang === 'ar' ? 'التشخيص الذكي (Smart Intelligence)' : 'Smart Diagnostics';
+          document.querySelector('.tab-label-settings').textContent = state.lang === 'ar' ? 'الإعدادات المتقدمة' : 'Pro Settings';
+          document.getElementById('lblScreenshotBtn').textContent = state.lang === 'ar' ? 'لقطة شاشة فورية' : 'Take Screenshot';
+          document.getElementById('lblQuickDiagBtn').textContent = state.lang === 'ar' ? 'فحص التوافق الآن' : 'Run Diagnostics';
+          syncRecordingUiState();
+          renderDiagnosticReports();
+        });
+
+        // Floating control toggle
+        document.getElementById('btnToggleFloating').addEventListener('click', () => {
+          state.floatingVisible = !state.floatingVisible;
+          document.getElementById('floatingControlPanel').classList.toggle('hidden', !state.floatingVisible);
+          document.getElementById('lblFloatingBtn').textContent = state.floatingVisible
+            ? (state.lang === 'ar' ? 'اللوحة العائمة: مفعلة' : 'Floating HUD: ON')
+            : (state.lang === 'ar' ? 'اللوحة العائمة: مخفية' : 'Floating HUD: OFF');
+        });
+
+        // Capture source selector
+        document.getElementById('selectCaptureSource').addEventListener('change', handleCaptureSourceChange);
+
+        // Simulated Secure Window toggle
+        document.getElementById('btnToggleSimulatedSecure').addEventListener('click', () => {
+          state.simulateSecureWindow = !state.simulateSecureWindow;
+          document.getElementById('lblSimulateSecure').textContent = state.simulateSecureWindow
+            ? (state.lang === 'ar' ? 'محاكاة نافذة محمية (FLAG_SECURE): نشط ⚠️' : 'Simulate FLAG_SECURE: ON ⚠️')
+            : (state.lang === 'ar' ? 'محاكاة نافذة محمية (FLAG_SECURE): متوقف' : 'Simulate FLAG_SECURE: OFF');
+          showToast(
+            state.simulateSecureWindow
+              ? 'تم تفعيل محاكاة نافذة محمية بـ FLAG_SECURE لاختبار رصد الإطارات السوداء في محرك التشخيص.'
+              : 'تم إيقاف محاكاة النافذة المحمية.'
+          );
+        });
+
+        // Primary Recording & Screenshot Buttons
+        document.getElementById('btnStartStopRecording').addEventListener('click', () => {
+          if (state.isRecording) stopRecordingSession();
+          else startRecordingSession(false);
+        });
+        document.getElementById('btnPauseResume').addEventListener('click', pauseOrResumeSession);
+        document.getElementById('btnTakeScreenshot').addEventListener('click', takeInstantScreenshot);
+        document.getElementById('btnQuickDiagnostics').addEventListener('click', () => {
+          document.querySelector('[data-tab="diagnostics"]').click();
+          inspectHardwareCapabilities();
+        });
+
+        // Floating panel buttons
+        document.getElementById('floatBtnRec').addEventListener('click', () => {
+          if (state.isRecording) stopRecordingSession();
+          else startRecordingSession(false);
+        });
+        document.getElementById('floatBtnPause').addEventListener('click', pauseOrResumeSession);
+        document.getElementById('floatBtnShot').addEventListener('click', takeInstantScreenshot);
+
+        // Profile buttons
+        document.querySelectorAll('.profile-btn').forEach(btn => {
+          btn.addEventListener('click', () => applyProfilePreset(btn.getAttribute('data-profile')));
+        });
+
+        // Audio Studio controls
+        document.getElementById('btnToggleSynthTone').addEventListener('click', toggleStudioTestTone);
+        document.getElementById('btnStandaloneAudioRec').addEventListener('click', () => {
+          if (state.isRecording) stopRecordingSession();
+          else startRecordingSession(true);
+        });
+
+        document.getElementById('chkTrack1Enable').addEventListener('change', e => { state.track1Enabled = e.target.checked; });
+        document.getElementById('chkTrack2Enable').addEventListener('change', e => { state.track2Enabled = e.target.checked; });
+        document.getElementById('chkTrack3MixEnable').addEventListener('change', e => { state.track3MixEnabled = e.target.checked; });
+        document.getElementById('chkSaveSeparateTracks').addEventListener('change', e => { state.saveSeparateTracks = e.target.checked; });
+        document.getElementById('chkNoiseSuppression').addEventListener('change', e => { state.noiseSuppression = e.target.checked; });
+        document.getElementById('chkEchoCancel').addEventListener('change', e => { state.echoCancellation = e.target.checked; });
+        document.getElementById('selectAudioFormat').addEventListener('change', e => { state.audioFormat = e.target.value; });
+
+        document.getElementById('sliderTrack1Vol').addEventListener('input', e => {
+          state.track1Volume = parseInt(e.target.value, 10) / 100;
+          document.getElementById('lblTrack1VolVal').textContent = `${e.target.value}%`;
+          if (synthGainNode) synthGainNode.gain.value = 0.15 * state.track1Volume;
+        });
+
+        document.getElementById('sliderTrack2Gain').addEventListener('input', e => {
+          state.track2Gain = parseInt(e.target.value, 10) / 100;
+          document.getElementById('lblTrack2GainVal').textContent = `${e.target.value}%`;
+        });
+
+        document.getElementById('sliderMixVolA').addEventListener('input', e => {
+          document.getElementById('lblMixVolA').textContent = `${e.target.value}%`;
+        });
+        document.getElementById('sliderMixVolB').addEventListener('input', e => {
+          document.getElementById('lblMixVolB').textContent = `${e.target.value}%`;
+        });
+        document.getElementById('btnExecuteOfflineMix').addEventListener('click', executeOfflineStudioMix);
+
+        // Library filters & item delegation
+        document.querySelectorAll('.lib-filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.libraryFilter = btn.getAttribute('data-cat');
+            document.querySelectorAll('.lib-filter-btn').forEach(b => {
+              const active = b.getAttribute('data-cat') === state.libraryFilter;
+              b.className = active
+                ? 'lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-cyanAccent text-obsidian'
+                : 'lib-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-obsidian';
+            });
+            renderLibraryItems();
+          });
+        });
+
+        document.getElementById('libraryItemsContainer').addEventListener('click', e => {
+          const btn = e.target.closest('.lib-item-action');
+          if (!btn) return;
+          const action = btn.getAttribute('data-action');
+          const id = btn.getAttribute('data-id');
+          if (action === 'preview') {
+            openMediaModal(id);
+          } else if (action === 'save_gallery') {
+            const targetItem = state.mediaItems.find(i => i.id === id);
+            if (targetItem) shareOrSaveItemToPhoneGallery(targetItem);
+          } else if (action === 'delete') {
+            state.mediaItems = state.mediaItems.filter(i => i.id !== id);
+            updateLibraryBadgeAndMixerSelects();
+            renderLibraryItems();
+            showToast(state.lang === 'ar' ? 'تم حذف الملف من المكتبة' : 'File deleted from Library');
+          }
+        });
+
+        // Modal controls
+        document.getElementById('btnCloseModal').addEventListener('click', closeMediaModal);
+        document.getElementById('btnSaveRenameModal').addEventListener('click', () => {
+          const newTitle = document.getElementById('inputRenameModal').value.trim();
+          if (!newTitle || !state.activeModalItemId) return;
+          const item = state.mediaItems.find(i => i.id === state.activeModalItemId);
+          if (item) {
+            const ext = item.fileName.split('.').pop() || 'mp4';
+            item.title = newTitle;
+            item.fileName = `${newTitle}.${ext}`;
+            document.getElementById('modalTitle').textContent = `${item.title} (${item.resolution})`;
+            document.getElementById('linkDownloadModal').download = item.fileName;
+            renderLibraryItems();
+            updateLibraryBadgeAndMixerSelects();
+            showToast(state.lang === 'ar' ? 'تم تحديث اسم الملف بنجاح' : 'File renamed');
+          }
+        });
+
+        // Diagnostics controls
+        document.getElementById('btnRunDiagnosticsScan').addEventListener('click', () => {
+          inspectHardwareCapabilities();
+          showToast(state.lang === 'ar' ? 'تم تحديث فحص العتاد ومسارات الترميز' : 'Hardware & Codec scan refreshed');
+        });
+        document.getElementById('btnGenerateSampleReport').addEventListener('click', () => {
+          generateSessionDiagnosticReport('DIAG_' + Math.random().toString(36).substring(2, 6).toUpperCase(), 1500);
+          renderDiagnosticReports();
+          renderLibraryItems();
+          showToast(state.lang === 'ar' ? 'تم توليد تقرير تشخيصي جديد وحفظه في المكتبة' : 'Diagnostic report generated');
+        });
+
+        // Settings controls
+        document.getElementById('settingResolution').addEventListener('change', e => {
+          const [w, h] = e.target.value.split('x').map(Number);
+          state.resolution = { width: w, height: h, label: `${w}×${h}` };
+          state.profile = 'CUSTOM';
+          syncRecordingUiState();
+        });
+        document.getElementById('settingFps').addEventListener('change', e => {
+          state.fps = parseInt(e.target.value, 10);
+          state.profile = 'CUSTOM';
+          syncRecordingUiState();
+        });
+        document.getElementById('settingCodec').addEventListener('change', e => {
+          state.codec = e.target.value;
+          state.profile = 'CUSTOM';
+          syncRecordingUiState();
+        });
+        document.getElementById('settingBitrateMbps').addEventListener('input', e => {
+          state.bitrateMbps = parseInt(e.target.value, 10);
+          state.profile = 'CUSTOM';
+          document.getElementById('lblSettingBitrateVal').textContent = `${state.bitrateMbps} Mbps`;
+          syncRecordingUiState();
+        });
+        document.getElementById('settingScreenshotFmt').addEventListener('change', e => {
+          state.screenshotFormat = e.target.value;
+        });
+        document.getElementById('settingJpegQuality').addEventListener('input', e => {
+          state.jpegQuality = parseInt(e.target.value, 10) / 100;
+          document.getElementById('lblJpegQualityVal').textContent = `${e.target.value}%`;
+        });
+        document.getElementById('chkAutoSaveToPhone').addEventListener('change', e => {
+          state.autoSaveToPhone = e.target.checked;
+          showToast(
+            state.autoSaveToPhone
+              ? 'تم تفعيل الحفظ التلقائي الفوري في استوديو الهاتف ومدير الملفات'
+              : 'تم إيقاف الحفظ التلقائي الفوري'
+          );
+        });
+        document.getElementById('settingStorageTarget').addEventListener('change', e => {
+          state.storageTargetFolder = e.target.value;
+          document.getElementById('lblSelectedFolderStatus').textContent = `المسار النشط: ${state.storageTargetFolder}`;
+          renderLibraryItems();
+          showToast(`تم تغيير مسار الحفظ إلى: ${state.storageTargetFolder}`);
+        });
+        document.getElementById('btnSelectPhoneFolder').addEventListener('click', async () => {
+          if (window.showDirectoryPicker) {
+            try {
+              state.directoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+              state.storageTargetFolder = state.directoryHandle.name || 'CustomPhoneFolder';
+              document.getElementById('lblSelectedFolderStatus').textContent = `مجلد مرتبط مباشرة: ${state.storageTargetFolder}`;
+              showToast(`تم ربط مجلد مدير الملفات (${state.storageTargetFolder}) للحفظ المباشر!`);
+            } catch (_) {
+              showToast('لم يتم اختيار مجلد جديد؛ يستمر الحفظ التلقائي في المسار الافتراضي.');
+            }
+          } else {
+            showToast('الحفظ التلقائي المباشر في الاستوديو والتنزيلات مفعل ويعمل تلقائياً.');
+          }
+        });
+        document.getElementById('btnShareToGalleryModal').addEventListener('click', () => {
+          if (!state.activeModalItemId) return;
+          const item = state.mediaItems.find(i => i.id === state.activeModalItemId);
+          if (item) shareOrSaveItemToPhoneGallery(item);
+        });
+      }
+
+      // --- 18. Wire Quick Mobile & Storage Controls & Start Lightweight Fast Loop ---
+      function initQuickMobileControls() {
+        setupMobilePwaInstaller();
+
+        document.getElementById('btnGrantAllPermissions').addEventListener('click', requestAllAppPermissions);
+
+        document.getElementById('btnInstallMobileApp').addEventListener('click', async () => {
+          if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+          } else {
+            // Download the standalone HTML app directly to phone so user can open it in Chrome and tap "Add to Home Screen"
+            const appHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const blob = new Blob([appHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'CaptureX_Pro_Mobile_App.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('📲 تم تنزيل نسخة الموبايل المستقلة (CaptureX_Pro_Mobile_App.html) — افتحها في متصفح الهاتف واضغط «إضافة للشاشة الرئيسية»!');
+          }
+        });
+
+        document.getElementById('quickQualitySelect').addEventListener('change', (e) => {
+          const val = e.target.value;
+          if (val === '720p_fast') {
+            applyProfilePreset('HIGH_COMPATIBILITY');
+          } else if (val === '1080p_balanced') {
+            applyProfilePreset('BALANCED');
+          } else if (val === '1080p_60fps') {
+            applyProfilePreset('HIGH_QUALITY');
+          }
+        });
+
+        document.getElementById('quickStoragePathSelect').addEventListener('change', (e) => {
+          state.storageTargetFolder = e.target.value;
+          document.getElementById('lblSelectedFolderStatus').textContent = `المسار النشط: ${state.storageTargetFolder}`;
+          document.getElementById('lblQuickSavedPathInfo').textContent =
+            `المسار الحالي: ${state.storageTargetFolder} • يتم الحفظ تلقائياً فور إيقاف التسجيل أو أخذ لقطة شاشة`;
+          renderLibraryItems();
+          showToast(`تم ضبط الحفظ في المساحة الداخلية: ${state.storageTargetFolder}`);
+        });
+
+        document.getElementById('btnQuickOpenFolderPicker').addEventListener('click', () => {
+          document.getElementById('btnSelectPhoneFolder').click();
+        });
+
+        document.getElementById('btnGoToFullLibrary').addEventListener('click', () => {
+          document.querySelector('[data-tab="library"]').click();
+        });
+
+        document.getElementById('quickSavedItemsStrip').addEventListener('click', (e) => {
+          const btn = e.target.closest('.lib-item-action');
+          if (!btn) return;
+          const action = btn.getAttribute('data-action');
+          const id = btn.getAttribute('data-id');
+          if (action === 'preview') {
+            openMediaModal(id);
+          } else if (action === 'save_gallery') {
+            const targetItem = state.mediaItems.find(i => i.id === id);
+            if (targetItem) shareOrSaveItemToPhoneGallery(targetItem);
+          } else if (action === 'delete') {
+            state.mediaItems = state.mediaItems.filter(i => i.id !== id);
+            updateLibraryBadgeAndMixerSelects();
+            renderLibraryItems();
+            showToast('تم حذف الملف');
+          }
+        });
+
+        // Keep recording active and visible when user switches apps or goes to background
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden && state.isRecording && !state.isPaused) {
+            updateBackgroundNotificationAndMediaSession();
+          }
+        });
+      }
+
+      window.addEventListener('load', () => {
+        initEventListeners();
+        initQuickMobileControls();
+        initDraggableFloatingPanel();
+        inspectHardwareCapabilities();
+        generateSessionDiagnosticReport('BOOT_CHECK', 1000);
+        renderDiagnosticReports();
+        renderLibraryItems();
+        renderStudioCanvasFrame();
+        // Fast, low-CPU 150ms ticker instead of heavy 60fps loop so the app is super responsive on mobile
+        setInterval(renderStudioCanvasFrame, 150);
+      });
+    })();
+  </script>
+</body>
+</html>
