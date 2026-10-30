@@ -1,2 +1,2 @@
 # CaptureXPro
-cam
+capturexpro
